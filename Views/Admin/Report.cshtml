@@ -1,0 +1,41 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@{
+    ViewBag.Title = "Báo cáo"; var rev = (List<RevenueRow>)ViewBag.Revenue; var coc = (CocSummary)ViewBag.Coc; var ns = (NoShowSummary)ViewBag.NoShow;
+    var top = (List<NameCount>)ViewBag.Top; var peak = (List<PeakRow>)ViewBag.Peak; var fill = (List<FillRow>)ViewBag.Fill;
+    decimal total = 0; foreach (var x in rev) { total += x.DoanhThu; }
+    int tong = ns.Tong; int nsCount = ns.NoShow;
+}
+<h2>Báo cáo & thống kê</h2>
+<form method="get" class="form-inline" style="margin-bottom:15px">
+    Từ <input type="date" name="tu" class="form-control" value="@ViewBag.Tu" /> đến <input type="date" name="den" class="form-control" value="@ViewBag.Den" />
+    <button class="btn btn-danger">Xem</button>
+</form>
+<div class="row">
+    <div class="col-md-6">
+        <h4>Doanh thu theo ngày – tổng <b>@Fmt.Money(total)</b></h4>
+        <table class="table table-condensed">
+            <tr><th>Ngày</th><th>Số HĐ</th><th class="text-right">Doanh thu</th></tr>
+            @foreach (var r in rev)
+            {
+                <tr><td>@r.Ngay.ToString("dd/MM/yyyy")</td><td>@r.SoHD</td><td class="text-right money">@Fmt.Money(r.DoanhThu)</td></tr>
+}
+        </table>
+        <h4>Tiền cọc</h4>
+        <p>Đã thu: <b>@Fmt.Money(coc.Thu)</b> · Đã hoàn: <b>@Fmt.Money(coc.Hoan)</b> · Mất do no-show (quán giữ): <b>@Fmt.Money(coc.Mat)</b></p>
+        <h4>Tỷ lệ no-show</h4>
+        <p>@nsCount / @tong đơn = <b>@(tong == 0 ? "0" : (nsCount * 100.0 / tong).ToString("0.0"))%</b> (mục tiêu &lt; 10%)</p>
+    </div>
+    <div class="col-md-6">
+        <h4>Món được gọi nhiều nhất</h4>
+        <table class="table table-condensed">@foreach (var r in top)
+        {<tr><td>@r.Ten</td><td>@r.SoLuong</td></tr>}</table>
+        <h4>Khung giờ cao điểm (số đơn đặt bàn theo giờ hẹn)</h4>
+        <table class="table table-condensed">@foreach (var r in peak)
+        {<tr><td>@(r.Gio)h</td><td>@r.SoDon đơn</td></tr>}</table>
+        <h4>Mức sử dụng theo khu vực (số đơn)</h4>
+        <table class="table table-condensed">@foreach (var r in fill)
+        {<tr><td>@r.Ten</td><td>@r.SoDon</td></tr>}</table>
+    </div>
+</div>

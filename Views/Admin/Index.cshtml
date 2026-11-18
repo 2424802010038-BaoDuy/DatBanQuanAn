@@ -1,0 +1,66 @@
+@{ ViewBag.Title = "Quản trị"; }
+<h2>Quản trị hệ thống</h2>
+<p class="text-muted">Chọn một mục để quản lý.</p>
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Sơ đồ bàn</h4><p>Thêm, sửa, xóa, tạm ngưng bàn.</p>
+                <a class="btn btn-danger btn-sm" href="@Url.Action("Tables", "Admin")">Quản lý bàn</a>
+                <a class="btn btn-default btn-sm" href="@Url.Action("QrSheet", "Admin")">In mã QR</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Khu vực & loại bàn</h4><p>Danh mục khu vực, loại bàn.</p>
+                <a class="btn btn-danger btn-sm" href="@Url.Action("Catalog", "Admin")">Quản lý danh mục</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Thực đơn</h4><p>Món ăn, giá, hình ảnh, Bếp/Bar.</p>
+                <a class="btn btn-danger btn-sm" href="@Url.Action("Menu", "Admin")">Quản lý thực đơn</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Tài khoản</h4><p>Nhân viên, khách thành viên, phân quyền.</p>
+                <a class="btn btn-danger btn-sm" href="@Url.Action("Staff", "Admin")">Quản lý tài khoản</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Đơn đặt bàn</h4><p>Tra cứu, lọc theo trạng thái, hủy đơn.</p>
+                <a class="btn btn-danger btn-sm" href="@Url.Action("Bookings", "Admin")">Xem đơn đặt bàn</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Cấu hình</h4><p>Mức cọc, thời gian giữ bàn, mã giảm giá.</p>
+                <a class="btn btn-danger btn-sm" href="@Url.Action("Config", "Admin")">Cấu hình</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Báo cáo</h4><p>Doanh thu, no-show, món bán chạy, giờ cao điểm.</p>
+                <a class="btn btn-danger btn-sm" href="@Url.Action("Report", "Admin")">Xem báo cáo</a>
+            </div>
+        </div>
+    </div>
+</div>

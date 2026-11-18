@@ -1,0 +1,46 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@using DatBanQuanAn.Models
+@{
+    ViewBag.Title = "Hóa đơn"; var ban = (Ban)ViewBag.Ban; var items = (List<BillItemRow>)ViewBag.Items; var bk = ViewBag.Booking as DonDatBan;
+}
+<h2>Hóa đơn – Bàn @ban.Ten <small>@ViewBag.KhuVuc</small></h2>
+@if (ViewBag.Msg != null)
+{<div class="alert alert-warning">@ViewBag.Msg</div>}
+@if ((int)ViewBag.Pending > 0)
+{<div class="alert alert-danger">Còn @ViewBag.Pending đơn QR chờ xác nhận. Hãy xử lý ở mục "Đơn gọi món" trước khi lập hóa đơn.</div>}
+@if (bk != null)
+{<p>Đơn đặt bàn <b>@bk.MaDon</b> – @bk.HoTen (@bk.SDT)</p>}
+<table class="table" style="max-width:700px">
+    <tr><th>Món</th><th class="text-right">SL</th><th class="text-right">Đơn giá</th><th class="text-right">Thành tiền</th><th>Đã thanh toán</th></tr>
+    @foreach (var r in items)
+    {
+        <tr>
+            <td>@r.Ten</td>
+            <td class="text-right">@r.SoLuong</td>
+            <td class="text-right money">@Fmt.Money(r.DonGia)</td>
+            <td class="text-right money">@Fmt.Money(r.SoLuong * r.DonGia)</td>
+            <td>@(r.DaThanhToan ? "✔" : "")</td>
+        </tr>
+    }
+    <tr><td colspan="3" class="text-right">Tổng tiền món</td><td class="text-right money">@Fmt.Money(ViewBag.Tong)</td><td></td></tr>
+    <tr><td colspan="3" class="text-right">Giảm giá</td><td class="text-right money">- @Fmt.Money(ViewBag.Giam)</td><td></td></tr>
+    <tr><td colspan="3" class="text-right">Món đã thanh toán online (không tính lại)</td><td class="text-right money">- @Fmt.Money(ViewBag.DaTra)</td><td></td></tr>
+    <tr><td colspan="3" class="text-right">Tiền cọc đã trả (khấu trừ)</td><td class="text-right money">- @Fmt.Money(ViewBag.Coc)</td><td></td></tr>
+    <tr class="success"><td colspan="3" class="text-right"><b>CÒN PHẢI TRẢ</b></td><td class="text-right money"><b>@Fmt.Money(ViewBag.ConPhai)</b></td><td></td></tr>
+</table>
+<form method="get" class="form-inline" style="margin-bottom:10px">
+    <input type="hidden" name="banId" value="@ban.Id" />
+    <input name="ma" class="form-control" placeholder="Mã giảm giá" value="@ViewBag.Ma" />
+    <button class="btn btn-default">Áp dụng mã</button>
+</form>
+@using (Html.BeginForm("PayBill", "Staff", FormMethod.Post, new { @class = "form-inline" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="banId" value="@ban.Id" />
+    <input type="hidden" name="ma" value="@ViewBag.Ma" />
+    <input name="sdt" class="form-control" placeholder="SĐT thành viên (tích điểm)" />
+    <select name="phuongThuc" class="form-control"><option value="TienMat">Tiền mặt</option><option value="Online">Online / chuyển khoản</option></select>
+    <button class="btn btn-danger btn-lg">Thu tiền & in hóa đơn</button>
+}

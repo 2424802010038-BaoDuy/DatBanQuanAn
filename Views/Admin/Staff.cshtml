@@ -1,0 +1,71 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Helpers
+@using DatBanQuanAn.Models
+@{ ViewBag.Title = "Tài khoản"; var list = (List<TaiKhoan>)ViewBag.List; string role = (string)ViewBag.Role ?? ""; }
+<h2>Tài khoản & phân quyền</h2>
+@if (TempData["Ok"] != null)
+{<div class="alert alert-success">@TempData["Ok"]</div>}
+@if (TempData["Err"] != null)
+{<div class="alert alert-danger">@TempData["Err"]</div>}
+<h4>Thêm tài khoản nhân viên</h4>
+@using (Html.BeginForm("AddStaff", "Admin", FormMethod.Post, new { @class = "form-inline", style = "margin-bottom:15px" }))
+{
+    @Html.AntiForgeryToken()
+    <input name="hoTen" class="form-control" placeholder="Họ tên" required />
+    <input name="sdt" class="form-control" placeholder="SĐT" required />
+    <input name="tenDangNhap" class="form-control" placeholder="Tên đăng nhập" required />
+    <input name="matKhau" type="password" class="form-control" placeholder="Mật khẩu tạm (≥8)" required />
+    <select name="vaiTro" class="form-control"><option value="PhucVu">Phục vụ/Thu ngân</option><option value="Bep">Bếp/Bar</option><option value="QuanLy">Quản lý</option></select>
+    <button class="btn btn-danger">Thêm</button>
+}
+<div class="btn-group" style="margin-bottom:10px">
+    <a class="btn @(role == "" ? "btn-danger" : "btn-default")" href="@Url.Action("Staff")">Tất cả</a>
+    <a class="btn @(role == "KhachThanhVien" ? "btn-danger" : "btn-default")" href="@Url.Action("Staff", new { role = "KhachThanhVien" })">Khách thành viên</a>
+    <a class="btn @(role == "PhucVu" ? "btn-danger" : "btn-default")" href="@Url.Action("Staff", new { role = "PhucVu" })">Phục vụ</a>
+    <a class="btn @(role == "Bep" ? "btn-danger" : "btn-default")" href="@Url.Action("Staff", new { role = "Bep" })">Bếp</a>
+    <a class="btn @(role == "QuanLy" ? "btn-danger" : "btn-default")" href="@Url.Action("Staff", new { role = "QuanLy" })">Quản lý</a>
+</div>
+<table class="table table-striped">
+    <tr><th>Họ tên / SĐT (sửa được)</th><th>Email / Đăng nhập</th><th>Vai trò</th><th>Điểm</th><th>No-show</th><th>Trạng thái</th><th></th></tr>
+    @foreach (var r in list)
+    {
+        bool khach = r.VaiTro == "KhachThanhVien";
+        <tr>
+            <td>
+                @using (Html.BeginForm("EditStaff", "Admin", FormMethod.Post, new { @class = "form-inline", style = "display:inline" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@r.Id" />
+                    <input name="hoTen" class="input-sm" value="@r.HoTen" required />
+                    <input name="sdt" class="input-sm" value="@r.SDT" required style="width:110px" />
+                    <button class="btn btn-xs btn-default">Lưu</button>
+                }
+            </td>
+            <td>@(r.Email ?? r.TenDangNhap)</td>
+            <td>
+                @if (khach)
+                {<text>Khách thành viên</text> }
+            else
+            {
+                using (Html.BeginForm("SetRole", "Admin", FormMethod.Post, new { style = "display:inline" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@r.Id" />
+                    <select name="vaiTro" onchange="this.form.submit()" class="input-sm">
+                        <option value="PhucVu" @(r.VaiTro == "PhucVu" ? "selected" : "")>Phục vụ/Thu ngân</option>
+                        <option value="Bep" @(r.VaiTro == "Bep" ? "selected" : "")>Bếp/Bar</option>
+                        <option value="QuanLy" @(r.VaiTro == "QuanLy" ? "selected" : "")>Quản lý</option>
+                    </select>
+                }
+            }
+            </td>
+            <td>@r.DiemTichLuy</td>
+            <td>@r.SoLanNoShow</td>
+            <td>@(r.TrangThai ? "Hoạt động" : "ĐÃ KHÓA")</td>
+            <td>
+                @Html.Partial("_PostBtn", new PostBtn("SetLock", "Admin", r.Id, r.TrangThai ? "Khóa" : "Mở khóa", "btn-default"))
+                @Html.Partial("_PostBtn", new PostBtn("ResetPw", "Admin", r.Id, "Đặt lại MK", "btn-default", "Đặt lại mật khẩu tài khoản này?"))
+            </td>
+        </tr>
+    }
+</table>

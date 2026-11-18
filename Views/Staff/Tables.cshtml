@@ -1,0 +1,66 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@using DatBanQuanAn.Models
+@{
+    ViewBag.Title = "Sơ đồ bàn"; var areas = (List<KhuVuc>)ViewBag.Areas; var tables = (List<StaffTableRow>)ViewBag.Tables; var free = (List<Ban>)ViewBag.Free; int kv = (int)ViewBag.Kv;
+}
+<h2>Sơ đồ bàn thời gian thực</h2>
+<ul class="nav nav-tabs" style="margin-bottom:10px">
+    @foreach (var a in areas)
+    {
+        <li class="@(a.Id == kv ? "active" : "")"><a href="@Url.Action("Tables", new { khuVucId = a.Id })">@a.Ten</a></li>
+    }
+</ul>
+<div class="legend">
+    <span class="st-Trong">Trống</span><span class="st-DaDat">Đã đặt trước</span><span class="st-DangCoKhach">Đang có khách</span>
+    <span class="st-DangDon">Đang dọn dẹp</span><span class="st-TamNgung">Tạm ngưng</span>
+    <a href="" class="btn btn-xs btn-default">Làm mới</a>
+</div>
+<div class="table-grid">
+    @foreach (var t in tables)
+    {
+        string st = t.TrangThai;
+        if (st == "Trong" && t.DonSapDen != null) { st = "DaDat"; }
+        <div class="tbl st-@st">
+            <h4>@t.Ten</h4>
+            <small>@t.Loai · @t.SucChua chỗ</small>
+            <small><b>@Fmt.StatusTable(st)</b></small>
+            @if (st == "Trong" || st == "DaDat")
+            {
+                using (Html.BeginForm("OpenTable", "Staff", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="banId" value="@t.Id" /><input type="hidden" name="kv" value="@kv" />
+                    <button class="btn btn-xs btn-default">Mở bàn (khách vãng lai)</button>
+                }
+            }
+            @if (st == "DangCoKhach")
+            {
+                <a class="btn btn-xs btn-warning" href="@Url.Action("Bill", new { banId = t.Id })">Hóa đơn</a>
+                using (Html.BeginForm("Move", "Staff", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="banId" value="@t.Id" /><input type="hidden" name="kv" value="@kv" />
+                    <select name="newBanId" class="input-sm" style="color:#000;width:100%;margin-top:4px" required>
+                        <option value="">Chuyển sang...</option>
+                        @foreach (var f in free)
+                        {
+                            <option value="@f.Id">@f.Ten (@f.SucChua)</option>
+}
+                    </select>
+                    <button class="btn btn-xs btn-default">Chuyển bàn</button>
+                }
+            }
+            @if (st == "DangDon")
+            {
+                using (Html.BeginForm("Clean", "Staff", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="banId" value="@t.Id" /><input type="hidden" name="kv" value="@kv" />
+                    <button class="btn btn-xs btn-default">Đã dọn xong</button>
+                }
+            }
+        </div>
+    }
+</div>

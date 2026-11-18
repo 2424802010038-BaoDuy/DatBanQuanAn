@@ -1,0 +1,52 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@{ ViewBag.Title = "Khu vực & loại bàn"; var areas = (List<CatalogRow>)ViewBag.Areas; var types = (List<CatalogRow>)ViewBag.Types; }
+<h2>Khu vực & loại bàn</h2>
+@if (TempData["Ok"] != null)
+{<div class="alert alert-success">@TempData["Ok"]</div>}
+@if (TempData["Err"] != null)
+{<div class="alert alert-danger">@TempData["Err"]</div>}
+<div class="row">
+    @foreach (var kind in new[] { "area", "type" })
+    {
+        var dt = kind == "area" ? areas : types;
+        <div class="col-md-6">
+            <h4>@(kind == "area" ? "Khu vực" : "Loại bàn")</h4>
+            @using (Html.BeginForm("AddCatalog", "Admin", FormMethod.Post, new { @class = "form-inline" }))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="kind" value="@kind" />
+                <input name="ten" class="form-control" placeholder="Tên mới" required />
+                <button class="btn btn-danger">Thêm</button>
+            }
+            <table class="table table-condensed" style="margin-top:10px">
+                @foreach (var r in dt)
+                {
+                    <tr>
+                        <td>
+                            @using (Html.BeginForm("RenameCatalog", "Admin", FormMethod.Post, new { @class = "form-inline", style = "display:inline" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="kind" value="@kind" />
+                                <input type="hidden" name="id" value="@r.Id" />
+                                <input name="ten" class="input-sm" value="@r.Ten" required />
+                                <button class="btn btn-xs btn-default">Đổi tên</button>
+                            }
+                        </td>
+                        <td>@r.SoBan bàn</td>
+                        <td>
+                            @using (Html.BeginForm("DeleteCatalog", "Admin", FormMethod.Post, new { style = "display:inline", onsubmit = "return confirm('Xóa mục này?')" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="kind" value="@kind" />
+                                <input type="hidden" name="id" value="@r.Id" />
+                                <button class="btn btn-xs btn-danger">Xóa</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+</div>

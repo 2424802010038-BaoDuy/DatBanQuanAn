@@ -1,0 +1,95 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@using DatBanQuanAn.Models
+@{
+    ViewBag.Title = "Gọi món";
+    var ban = (Ban)ViewBag.Ban; var menu = ViewBag.Menu as List<MonAn>; var orders = ViewBag.Orders as List<MenuOrderRow>;
+}
+<h2>Bàn @ban.Ten <small>@ViewBag.KhuVuc</small></h2>
+@if (menu == null)
+{
+    <div class="alert alert-warning">Bàn này chưa được mở. Vui lòng báo nhân viên phục vụ để mở bàn rồi quét lại mã QR.</div>
+}
+else
+{
+    if (orders != null && orders.Count > 0)
+    {
+        <h4>Món đã gọi</h4>
+        <table class="table table-condensed">
+            @foreach (var o in orders)
+            {
+                string tt = o.TrangThaiDon == "ChoXacNhan" ? "Chờ nhân viên xác nhận" :
+                            o.TrangThai == "ChoCheBien" ? "Chờ chế biến" :
+                            o.TrangThai == "DangCheBien" ? "Đang chế biến" :
+                            o.TrangThai == "DaXong" ? "Đã xong, sắp mang ra" : "Đã phục vụ";
+                <tr><td>@o.Ten × @o.SoLuong</td><td>@tt</td><td>@(o.DaThanhToan ? "Đã thanh toán" : "Chưa thanh toán")</td></tr>
+            }
+        </table>
+        <p><a href="">Làm mới trạng thái</a></p>
+    }
+    <h4>Thực đơn</h4>
+    string cat = null;
+    foreach (var m in menu)
+    {
+        if (m.DanhMuc != cat)
+        {
+            cat = m.DanhMuc; <h5 style="margin-top:20px"><b>@cat</b></h5> }
+        <div class="dish clearfix">
+            @if (m.HinhAnh != null)
+            {<img src="~/Content/img/menu/@m.HinhAnh" alt="" />}
+            <b>@m.Ten</b> – <span class="money">@Fmt.Money(m.DonGia)</span>
+            @if (m.MoTa != null)
+            {<div class="small text-muted">@m.MoTa</div>}
+            <div style="margin-top:6px">
+                <button type="button" class="btn btn-sm btn-default" onclick="chg(@m.Id, -1)">−</button>
+                <span id="@("q" + m.Id)" style="display:inline-block;width:30px;text-align:center">0</span>
+                <button type="button" class="btn btn-sm btn-danger" onclick="chg(@m.Id, 1)" data-name="@m.Ten" data-price="@(Convert.ToInt32(m.DonGia))" id="@("b" + m.Id)">+</button>
+            </div>
+        </div>
+    }
+    <div style="height:90px"></div>
+    <div class="cart-bar">
+        @using (Html.BeginForm("Submit", "Menu", FormMethod.Post, new { id = "orderForm" }))
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="token" value="@ViewBag.Token" />
+            <input type="hidden" name="cart" id="cart" />
+            <div class="row">
+                <div class="col-xs-6">
+                    Tổng: <b id="total">0đ</b> (<span id="count">0</span> món)<br />
+                    <input name="note" id="note" class="input-sm form-control" placeholder="Ghi chú món (tùy chọn)" maxlength="200" />
+                </div>
+                <div class="col-xs-6 text-right">
+                    <button name="hinhThuc" value="Online" class="btn btn-success" onclick="return submitCart()">Thanh toán online</button>
+                    <button name="hinhThuc" value="TienMat" class="btn btn-default" onclick="return submitCart()">Trả tiền mặt</button>
+                </div>
+            </div>
+        }
+    </div>
+}
+@section scripts {
+    <script>
+        var cart = {};
+        function chg(id, d) {
+            var b = document.getElementById('b' + id);
+            var cur = (cart[id] ? cart[id].qty : 0) + d;
+            if (cur < 0) cur = 0; if (cur > 50) cur = 50;
+            if (cur === 0) delete cart[id]; else cart[id] = { id: id, qty: cur, price: parseInt(b.getAttribute('data-price')) };
+            document.getElementById('q' + id).textContent = cur; upd();
+        }
+        function upd() {
+            var t = 0, c = 0;
+            for (var k in cart) { t += cart[k].qty * cart[k].price; c += cart[k].qty; }
+            document.getElementById('total').textContent = t.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('count').textContent = c;
+        }
+        function submitCart() {
+            var arr = [], note = document.getElementById('note').value;
+            for (var k in cart) arr.push({ id: cart[k].id, qty: cart[k].qty, note: note });
+            if (arr.length === 0) { alert('Giỏ hàng trống'); return false; }
+            document.getElementById('cart').value = JSON.stringify(arr);
+            return true;
+        }
+    </script>
+}

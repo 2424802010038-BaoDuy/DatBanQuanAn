@@ -1,0 +1,7 @@
+@model DatBanQuanAn.Helpers.PostBtn
+@using (Html.BeginForm(Model.Action, Model.Controller, FormMethod.Post, new { style = "display:inline", onsubmit = string.IsNullOrEmpty(Model.Confirm) ? null : "return confirm('" + Model.Confirm + "')" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button class="btn btn-xs @Model.Css">@Model.Label</button>
+}

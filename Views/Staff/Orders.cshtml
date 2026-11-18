@@ -1,0 +1,38 @@
+@using System.Collections.Generic
+@using System.Linq
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@{ ViewBag.Title = "Đơn gọi món"; var pend = (List<PendingOrderRow>)ViewBag.Pending; var items = (List<PendingItemRow>)ViewBag.PendingItems; var ready = (List<ReadyItemRow>)ViewBag.Ready; }
+<meta http-equiv="refresh" content="20" />
+<h2>Đơn gọi món qua QR chờ xác nhận</h2>
+@if (pend.Count == 0)
+{<p class="text-muted">Không có đơn chờ.</p>}
+@foreach (var g in pend)
+{
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <b>Bàn @g.Ban</b>
+            <span class="label label-@(g.DaThanhToan ? "success" : "warning")">@(g.DaThanhToan ? "Đã thanh toán online" : "Trả tiền mặt – chưa thanh toán")</span>
+            <span class="pull-right">@g.NgayTao.ToString("HH:mm")</span>
+        </div>
+        <div class="panel-body">
+            <ul>@foreach (var i in items.Where(x => x.DonGoiMonId == g.Id))
+            {<li>@i.Ten × @i.SoLuong @(i.GhiChu == null ? "" : "(" + i.GhiChu + ")")</li>}</ul>
+            @Html.Partial("_PostBtn", new PostBtn("ConfirmOrder", "Staff", g.Id, "Xác nhận & chuyển Bếp/Bar", "btn-success"))
+            @Html.Partial("_PostBtn", new PostBtn("RejectOrder", "Staff", g.Id, "Hủy đơn", "btn-danger", "Hủy đơn sai/trùng?"))
+        </div>
+    </div>
+}
+<h3>Món đã xong – mang ra bàn</h3>
+@if (ready.Count == 0)
+{<p class="text-muted">Chưa có món nào chờ phục vụ.</p>}
+<table class="table table-condensed">
+    @foreach (var r in ready)
+    {
+        <tr>
+            <td>Bàn @r.Ban</td>
+            <td>@r.Ten × @r.SoLuong</td>
+            <td>@Html.Partial("_PostBtn", new PostBtn("Served", "Staff", r.Id, "Đã phục vụ"))</td>
+        </tr>
+    }
+</table>

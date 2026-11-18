@@ -1,0 +1,189 @@
+body{padding-top:60px;background:#faf7f2}
+.navbar-inverse{background:#8b2e1f;border-color:#6d2216}
+.navbar-inverse .navbar-brand,.navbar-inverse .navbar-nav>li>a{color:#fff}
+.navbar-inverse .navbar-nav>li>a:hover{background:#6d2216}
+.body-content{padding-bottom:40px}
+.hero{background:#fff;border-radius:8px;padding:30px;margin-bottom:20px;border:1px solid #eadfd0}
+.flow-card{background:#fff;border:1px solid #eadfd0;border-radius:8px;padding:15px;margin-bottom:15px;min-height:150px}
+.table-grid{display:flex;flex-wrap:wrap;gap:12px;margin:15px 0}
+.tbl{width:150px;border-radius:8px;padding:10px;color:#fff;text-align:center;position:relative}
+.tbl h4{margin:0 0 4px;font-weight:700}
+.tbl small{display:block;opacity:.95}
+.tbl .btn{margin-top:6px}
+.st-Trong{background:#2e8b57}.st-DaDat{background:#e69500}.st-DangCoKhach{background:#c0392b}
+.st-DangDon{background:#7f8c8d}.st-TamNgung{background:#34495e}
+.pick{display:block;cursor:pointer}
+.pick input{margin-right:6px}
+.tbl.na{background:#bbb;cursor:not-allowed}
+.legend span{display:inline-block;padding:2px 10px;border-radius:12px;color:#fff;margin-right:6px;font-size:12px}
+.cart-bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:2px solid #8b2e1f;padding:10px 15px;z-index:50}
+.dish{background:#fff;border:1px solid #eadfd0;border-radius:8px;padding:10px;margin-bottom:10px}
+.dish img{max-width:80px;max-height:80px;border-radius:6px;float:left;margin-right:10px}
+.money{white-space:nowrap}
+.late{background:#fde8e6}
+.qr-item{display:inline-block;width:230px;text-align:center;margin:10px;padding:10px;border:1px dashed #999;background:#fff}
+.qr-item img{width:200px}
+.inv{max-width:420px;margin:0 auto;background:#fff;padding:20px;border:1px solid #ccc;font-family:monospace}
+@media print{.navbar,.no-print,.cart-bar{display:none!important}body{padding-top:0;background:#fff}}
+body {
+    padding-top: 70px;
+}
+
+.pull-right {
+    float: right !important;
+}
+
+.pull-left {
+    float: left !important;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.text-left {
+    text-align: left !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.img-responsive {
+    max-width: 100%;
+    height: auto;
+}
+
+.btn-default {
+    color: #212529;
+    background: #fff;
+    border: 1px solid #ced4da;
+}
+
+    .btn-default:hover {
+        background: #e9ecef;
+    }
+
+.btn-xs {
+    padding: .1rem .4rem;
+    font-size: .75rem;
+    border-radius: .2rem;
+}
+
+.input-sm {
+    padding: .25rem .5rem;
+    font-size: .875rem;
+    border: 1px solid #ced4da;
+    border-radius: .2rem;
+}
+
+.form-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+}
+
+    .form-inline .form-control {
+        width: auto;
+        display: inline-block;
+    }
+
+.table-condensed > :not(caption) > * > * {
+    padding: .25rem;
+}
+
+.panel {
+    border: 1px solid #dee2e6;
+    border-radius: .375rem;
+    margin-bottom: 1rem;
+    background: #fff;
+}
+
+.panel-heading {
+    padding: .6rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.panel-body {
+    padding: 1rem;
+}
+
+.well {
+    padding: 1rem;
+    background: #f8f9fa;
+    border: 1px solid #e3e3e3;
+    border-radius: .375rem;
+}
+
+.label {
+    display: inline-block;
+    padding: .25em .6em;
+    font-size: .75em;
+    font-weight: 700;
+    color: #fff;
+    border-radius: .25rem;
+    background: #6c757d;
+}
+
+.label-default {
+    background: #6c757d;
+}
+
+.label-success {
+    background: #198754;
+}
+
+.label-warning {
+    background: #ffc107;
+    color: #000;
+}
+
+.label-danger {
+    background: #dc3545;
+}
+
+.label-info {
+    background: #0dcaf0;
+    color: #000;
+}
+
+.nav-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding-left: 0;
+    border-bottom: 1px solid #dee2e6;
+}
+
+    .nav-tabs > li > a {
+        display: block;
+        padding: .5rem 1rem;
+        text-decoration: none;
+        border: 1px solid transparent;
+        border-radius: .375rem .375rem 0 0;
+        margin-bottom: -1px;
+    }
+
+    .nav-tabs > li.active > a {
+        background: #fff;
+        color: #495057;
+        border-color: #dee2e6 #dee2e6 #fff;
+    }
+.col-md-offset-1 {
+    margin-left: 8.33333333%;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.radio, .checkbox {
+    margin: .3rem 0;
+}
+
+    .radio label, .checkbox label {
+        font-weight: 400;
+        cursor: pointer;
+    }

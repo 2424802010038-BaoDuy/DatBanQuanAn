@@ -1,0 +1,54 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@using DatBanQuanAn.Models
+@{
+    ViewBag.Title = "Quản lý bàn"; var list = (List<AdminTableRow>)ViewBag.List; var areas = (List<KhuVuc>)ViewBag.Areas; var types = (List<LoaiBan>)ViewBag.Types; var e = ViewBag.Edit as Ban;
+}
+<h2>Quản lý sơ đồ bàn</h2>
+@using (Html.BeginForm("SaveTable", "Admin", FormMethod.Post, new { @class = "form-inline", style = "margin-bottom:15px" }))
+{
+    @Html.AntiForgeryToken()
+    if (e != null)
+    {
+        <input type="hidden" name="id" value="@e.Id" />
+ }
+    <input name="ten" class="form-control" placeholder="Tên bàn" required value="@(e != null ? e.Ten : "")" />
+    <input type="number" name="sucChua" class="form-control" min="1" style="width:100px" placeholder="Sức chứa" required value="@(e != null ? e.SucChua.ToString() : "")" />
+    <select name="khuVucId" class="form-control">
+        @foreach (var a in areas)
+        {
+            <option value="@a.Id" @(e != null && e.KhuVucId == a.Id ? "selected" : "")>@a.Ten</option>
+}
+    </select>
+    <select name="loaiBanId" class="form-control">
+        @foreach (var t in types)
+        {
+            <option value="@t.Id" @(e != null && e.LoaiBanId == t.Id ? "selected" : "")>@t.Ten</option>
+}
+    </select>
+    <button class="btn btn-danger">@(e != null ? "Cập nhật bàn" : "Thêm bàn")</button>
+    if (e != null)
+    { <a class="btn btn-default" href="@Url.Action("Tables")">Hủy sửa</a>}
+}
+<p><a class="btn btn-default" target="_blank" href="@Url.Action("QrSheet")">In tất cả mã QR</a></p>
+<table class="table table-striped">
+    <tr><th>Bàn</th><th>Khu vực</th><th>Loại</th><th>Sức chứa</th><th>Trạng thái</th><th>QR</th><th></th></tr>
+    @foreach (var r in list)
+    {
+        <tr>
+            <td>@r.Ten</td>
+            <td>@r.KhuVuc</td>
+            <td>@r.Loai</td>
+            <td>@r.SucChua</td>
+            <td>@Fmt.StatusTable(r.TrangThai)</td>
+            <td><a target="_blank" href="@Url.Action("Qr", new { id = r.Id })">Xem QR</a></td>
+            <td>
+                <a class="btn btn-xs btn-default" href="@Url.Action("Tables", new { edit = r.Id })">Sửa</a>
+                @Html.Partial("_PostBtn", new PostBtn("ToggleTable", "Admin", r.Id, r.TrangThai == "TamNgung" ? "Mở lại" : "Tạm ngưng"))
+                @Html.Partial("_PostBtn", new PostBtn("RegenQr", "Admin", r.Id, "Tạo lại QR", "btn-default", "Mã QR cũ sẽ vô hiệu. Tiếp tục?"))
+                @Html.Partial("_PostBtn", new PostBtn("DeleteTable", "Admin", r.Id, "Xóa", "btn-danger", "Xóa bàn này?"))
+            </td>
+        </tr>
+    }
+</table>

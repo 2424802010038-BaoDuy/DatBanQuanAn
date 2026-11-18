@@ -1,0 +1,52 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@{ ViewBag.Title = "Đặt bàn"; var areas = ViewBag.Areas as List<AreaInfo>; var tables = ViewBag.Tables as List<TableInfo>; }
+<h2>Đặt bàn</h2>
+@if (ViewBag.Err != null)
+{<div class="alert alert-danger">@ViewBag.Err</div>}
+<form method="get" action="@Url.Action("Index")" class="form-inline" style="margin-bottom:15px">
+    <label>Ngày</label> <input type="date" name="ngay" class="form-control" value="@ViewBag.Ngay" required />
+    <label>Giờ</label> <input type="time" name="gio" class="form-control" value="@ViewBag.Gio" required />
+    <label>Số người</label> <input type="number" name="soNguoi" min="1" max="50" class="form-control" style="width:80px" value="@ViewBag.SoNguoi" />
+    <button class="btn btn-danger">Xem khu vực còn bàn</button>
+</form>
+@if (areas != null)
+{
+    <h4>Bước 1: Chọn khu vực</h4>
+    <div class="btn-group" style="margin-bottom:15px">
+        @foreach (var a in areas)
+        {
+            bool sel = ViewBag.KhuVucId != null && (int)ViewBag.KhuVucId == a.Id;
+            <a class="btn @(sel ? "btn-danger" : "btn-default")"
+               href="@Url.Action("Index", new { ngay = ViewBag.Ngay, gio = ViewBag.Gio, soNguoi = ViewBag.SoNguoi, khuVucId = a.Id })">
+                @a.Ten <span class="badge">@a.SoTrong bàn trống</span>
+            </a>
+        }
+    </div>
+}
+@if (tables != null)
+{
+    <h4>Bước 2: Chọn bàn</h4>
+    <form method="get" action="@Url.Action("Create")">
+        <input type="hidden" name="ngay" value="@ViewBag.Ngay" />
+        <input type="hidden" name="gio" value="@ViewBag.Gio" />
+        <input type="hidden" name="soNguoi" value="@ViewBag.SoNguoi" />
+        <div class="legend"><span class="st-Trong">Còn trống</span><span style="background:#bbb">Không chọn được</span></div>
+        <div class="table-grid">
+            @foreach (var t in tables)
+            {
+                bool ok = t.Trong;
+                <label class="tbl @(ok ? "st-Trong pick" : "na")">
+                    <h4>@t.Ten</h4>
+                    <small>@t.Loai · @t.SucChua chỗ</small>
+                    @if (ok)
+                    {<input type="radio" name="banId" value="@t.Id" required /> <span>Chọn</span> }
+                    else
+                    { <small>Hết chỗ / không đủ sức chứa</small>}
+                </label>
+            }
+        </div>
+        <button class="btn btn-danger">Tiếp tục</button>
+    </form>
+}
