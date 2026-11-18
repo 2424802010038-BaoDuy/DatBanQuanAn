@@ -43,6 +43,7 @@
                             <input type="date" name="ngay" required style="width:130px" /> <input type="time" name="gio" required style="width:90px" />
                             <button class="btn btn-xs btn-default">Đổi giờ</button>
                         }
+                        <a class="btn btn-xs btn-default" href="@Url.Action("ChangeTable", new { id = d.Id, sdt = d.SDT, ma = d.MaDon })">Đổi bàn</a>
                     }
                 </td>
             </tr>

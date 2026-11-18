@@ -308,6 +308,7 @@
     <Content Include="Views\Staff\Invoice.cshtml" />
     <Content Include="Views\Staff\Orders.cshtml" />
     <Content Include="Views\Staff\Tables.cshtml" />
+    <Content Include="Views\Booking\ChangeTable.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

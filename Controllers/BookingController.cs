@@ -82,21 +82,30 @@ namespace DatBanQuanAn.Controllers
                    };
         }
 
-        public ActionResult Index(string ngay, string gio, int? soNguoi, int? khuVucId)
+        public ActionResult Index(string ngay, string gio, int? soNguoi, int? khuVucId, int? loaiBanId)
         {
             if (string.IsNullOrEmpty(ngay)) ngay = DateTime.Now.ToString("yyyy-MM-dd");
             if (string.IsNullOrEmpty(gio)) gio = DateTime.Now.AddHours(1).ToString("HH") + ":00";
             int n = soNguoi ?? 2;
-            ViewBag.Ngay = ngay; ViewBag.Gio = gio; ViewBag.SoNguoi = n; ViewBag.KhuVucId = khuVucId;
+            ViewBag.Ngay = ngay; ViewBag.Gio = gio; ViewBag.SoNguoi = n; ViewBag.KhuVucId = khuVucId; ViewBag.LoaiBanId = loaiBanId;
+            ViewBag.Types = db.LoaiBans.OrderBy(x => x.Id).ToList();
             DateTime dt;
             if (!TryDt(ngay, gio, out dt)) { ViewBag.Err = "Ngày giờ không hợp lệ."; return View(); }
             if (dt < DateTime.Now) { ViewBag.Err = "Vui lòng chọn thời điểm trong tương lai."; return View(); }
             if (n < 1 || n > 50) { ViewBag.Err = "Số người từ 1 đến 50."; return View(); }
 
+            string loaiTen = null;
+            if (loaiBanId.HasValue)
+            {
+                var lb = db.LoaiBans.Find(loaiBanId.Value);
+                if (lb != null) loaiTen = lb.Ten;
+            }
+
             var areas = new List<AreaInfo>();
             foreach (var a in db.KhuVucs.OrderBy(x => x.Id).ToList())
             {
                 var t = BookingService.Tables(db, dt, n, a.Id);
+                if (loaiTen != null) t = t.Where(x => x.Loai == loaiTen).ToList();
                 areas.Add(new AreaInfo { Id = a.Id, Ten = a.Ten, SoTrong = t.Count(x => x.Trong) });
                 if (khuVucId.HasValue && a.Id == khuVucId.Value) ViewBag.Tables = t;
             }
@@ -298,6 +307,68 @@ namespace DatBanQuanAn.Controllers
                 {
                     if (BookingService.IsConflict(db, d.BanId, dt, id)) { tx.Rollback(); TempData["Err"] = "Bàn đã có người đặt ở khung giờ mới."; }
                     else { d.NgayGio = dt; db.SaveChanges(); tx.Commit(); TempData["Ok"] = "Đã đổi giờ đặt bàn."; }
+                }
+            }
+            return RedirectToAction("Lookup", new { sdt, ma });
+        }
+        DonDatBan FindOwn(int id, string sdt, string ma)
+        {
+            int userId = Cur.UserId ?? -1;
+            string sdtQ = sdt ?? "", maQ = ma ?? "";
+            return db.DonDatBans.FirstOrDefault(x => x.Id == id
+                        && (x.TrangThai == "DaCoc" || x.TrangThai == "DaThanhToan")
+                        && (x.KhachId == userId || (x.SDT == sdtQ && x.MaDon == maQ)));
+        }
+
+        public ActionResult ChangeTable(int id, string sdt, string ma)
+        {
+            var d = FindOwn(id, sdt, ma);
+            if (d == null) { TempData["Err"] = "Không tìm thấy đơn hoặc đơn không thể đổi bàn."; return RedirectToAction("Lookup", new { sdt, ma }); }
+            if ((d.NgayGio - DateTime.Now).TotalHours < 2)
+            { TempData["Err"] = "Chỉ được đổi bàn trước giờ hẹn ít nhất 2 giờ."; return RedirectToAction("Lookup", new { sdt, ma }); }
+
+            var cur = db.Bans.Find(d.BanId);
+            var options = new List<TableOption>();
+            foreach (var a in db.KhuVucs.OrderBy(x => x.Id).ToList())
+            {
+                foreach (var t in BookingService.Tables(db, d.NgayGio, d.SoNguoi, a.Id).Where(x => x.Trong && x.Id != d.BanId))
+                {
+                    var b = db.Bans.Find(t.Id);
+                    if (b != null && !b.Xoa && b.LoaiBanId == cur.LoaiBanId)
+                        options.Add(new TableOption { Id = b.Id, KhuVuc = a.Ten, Ten = b.Ten, SucChua = b.SucChua });
+                }
+            }
+            ViewBag.D = DonViews().FirstOrDefault(x => x.Id == id);
+            ViewBag.Options = options;
+            ViewBag.Sdt = sdt; ViewBag.Ma = ma;
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult ChangeTable(int id, int newBanId, string sdt, string ma)
+        {
+            var d = FindOwn(id, sdt, ma);
+            if (d == null) TempData["Err"] = "Không tìm thấy đơn hoặc đơn không thể đổi bàn.";
+            else if ((d.NgayGio - DateTime.Now).TotalHours < 2) TempData["Err"] = "Chỉ được đổi bàn trước giờ hẹn ít nhất 2 giờ.";
+            else
+            {
+                var cur = db.Bans.Find(d.BanId);
+                var nb = db.Bans.FirstOrDefault(x => x.Id == newBanId && !x.Xoa);
+                if (nb == null || nb.LoaiBanId != cur.LoaiBanId || nb.SucChua < d.SoNguoi || nb.TrangThai == "TamNgung")
+                    TempData["Err"] = "Bàn mới không hợp lệ (phải cùng loại, đủ chỗ và đang hoạt động).";
+                else
+                {
+                    using (var tx = db.Database.BeginTransaction(IsolationLevel.Serializable))
+                    {
+                        if (BookingService.IsConflict(db, newBanId, d.NgayGio, id))
+                        { tx.Rollback(); TempData["Err"] = "Bàn mới vừa có người đặt, vui lòng chọn bàn khác."; }
+                        else
+                        {
+                            d.BanId = newBanId; db.SaveChanges(); tx.Commit();
+                            BookingService.Notify(db, d.SDT, "Don " + d.MaDon + " da doi sang ban " + nb.Ten + " luc " + Fmt.Date(d.NgayGio));
+                            TempData["Ok"] = "Đã đổi sang bàn " + nb.Ten + ".";
+                        }
+                    }
                 }
             }
             return RedirectToAction("Lookup", new { sdt, ma });

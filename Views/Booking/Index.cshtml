@@ -1,7 +1,11 @@
 @using System.Collections.Generic
 @using DatBanQuanAn.Controllers
 @using DatBanQuanAn.Helpers
-@{ ViewBag.Title = "Đặt bàn"; var areas = ViewBag.Areas as List<AreaInfo>; var tables = ViewBag.Tables as List<TableInfo>; }
+@using DatBanQuanAn.Models
+@{
+    ViewBag.Title = "Đặt bàn"; var areas = ViewBag.Areas as List<AreaInfo>; var tables = ViewBag.Tables as List<TableInfo>;
+    var types = ViewBag.Types as List<LoaiBan> ?? new List<LoaiBan>(); int? loaiSel = ViewBag.LoaiBanId as int?;
+}
 <h2>Đặt bàn</h2>
 @if (ViewBag.Err != null)
 {<div class="alert alert-danger">@ViewBag.Err</div>}
@@ -9,6 +13,14 @@
     <label>Ngày</label> <input type="date" name="ngay" class="form-control" value="@ViewBag.Ngay" required />
     <label>Giờ</label> <input type="time" name="gio" class="form-control" value="@ViewBag.Gio" required />
     <label>Số người</label> <input type="number" name="soNguoi" min="1" max="50" class="form-control" style="width:80px" value="@ViewBag.SoNguoi" />
+    <label>Loại bàn</label>
+    <select name="loaiBanId" class="form-control">
+        <option value="">Tất cả loại</option>
+        @foreach (var l in types)
+        {
+            <option value="@l.Id" @(loaiSel == l.Id ? "selected" : "")>@l.Ten</option>
+        }
+    </select>
     <button class="btn btn-danger">Xem khu vực còn bàn</button>
 </form>
 @if (areas != null)
@@ -19,7 +31,7 @@
         {
             bool sel = ViewBag.KhuVucId != null && (int)ViewBag.KhuVucId == a.Id;
             <a class="btn @(sel ? "btn-danger" : "btn-default")"
-               href="@Url.Action("Index", new { ngay = ViewBag.Ngay, gio = ViewBag.Gio, soNguoi = ViewBag.SoNguoi, khuVucId = a.Id })">
+               href="@Url.Action("Index", new { ngay = ViewBag.Ngay, gio = ViewBag.Gio, soNguoi = ViewBag.SoNguoi, khuVucId = a.Id, loaiBanId = ViewBag.LoaiBanId })">
                 @a.Ten <span class="badge">@a.SoTrong bàn trống</span>
             </a>
         }
@@ -28,6 +40,10 @@
 @if (tables != null)
 {
     <h4>Bước 2: Chọn bàn</h4>
+    if (tables.Count == 0)
+    {
+        <div class="alert alert-warning">Khu vực này không có bàn thuộc loại đã chọn.</div>
+    }
     <form method="get" action="@Url.Action("Create")">
         <input type="hidden" name="ngay" value="@ViewBag.Ngay" />
         <input type="hidden" name="gio" value="@ViewBag.Gio" />
