@@ -1,0 +1,12 @@
+@{ ViewBag.Title = "Trang chủ"; }
+<div class="hero text-center">
+    <h1>Đặt bàn quán ăn trực tuyến</h1>
+    <p class="lead">Chọn khu vực, chọn bàn trên sơ đồ, đặt cọc giữ chỗ – nhanh chóng, không trùng bàn.</p>
+    <a class="btn btn-danger btn-lg" href="@Url.Action("Index", "Booking")">Đặt bàn ngay</a>
+</div>
+<div class="row">
+    <div class="col-md-4"><div class="flow-card"><h4>1. Đặt bàn nhanh</h4><p>Không cần tài khoản: nhập SĐT, chọn ngày giờ, khu vực, bàn và mức cọc rồi thanh toán giữ bàn.</p></div></div>
+    <div class="col-md-4"><div class="flow-card"><h4>2. Đặt bàn kèm món</h4><p>Đăng nhập, chọn bàn và món ăn, thanh toán 100% tiền món. Đến là có món ngay.</p></div></div>
+    <div class="col-md-4"><div class="flow-card"><h4>3. Gọi món tại bàn</h4><p>Quét mã QR trên bàn để xem thực đơn, gọi món và thanh toán bằng điện thoại hoặc tiền mặt.</p></div></div>
+</div>
+<p class="text-muted">Tra cứu / hủy đơn: @Html.ActionLink("Đơn của tôi", "Lookup", "Booking").</p>

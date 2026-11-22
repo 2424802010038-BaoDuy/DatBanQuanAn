@@ -149,6 +149,7 @@
     <Compile Include="Helpers\BookingService.cs" />
     <Compile Include="Helpers\Db.cs" />
     <Compile Include="Helpers\Fmt.cs" />
+    <Compile Include="Helpers\KitchenLink.cs" />
     <Compile Include="Helpers\Mailer.cs" />
     <Compile Include="Helpers\PostBtn.cs" />
     <Compile Include="Helpers\Security.cs" />
@@ -309,6 +310,7 @@
     <Content Include="Views\Staff\Orders.cshtml" />
     <Content Include="Views\Staff\Tables.cshtml" />
     <Content Include="Views\Booking\ChangeTable.cshtml" />
+    <Content Include="Views\Account\ChangePass.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

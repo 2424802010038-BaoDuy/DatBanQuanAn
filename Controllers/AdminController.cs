@@ -392,7 +392,7 @@ namespace DatBanQuanAn.Controllers
         [HttpPost]
         public ActionResult SaveCfg(string khoa, int giaTri)
         {
-            if (giaTri < 1) TempData["Err"] = "Giá trị phải lớn hơn 0.";
+            if (giaTri < (khoa == "BepTruocPhut" ? 0 : 1)) TempData["Err"] = "Giá trị không hợp lệ.";
             else
             {
                 var c = db.CauHinhs.Find(khoa);
@@ -495,6 +495,7 @@ namespace DatBanQuanAn.Controllers
                     Ngay = DateTime.Now
                 });
             }
+            KitchenLink.CancelPending(db, d.Id);
             db.SaveChanges();
             TempData["Ok"] = "Đã hủy đơn " + d.MaDon + (hoanCoc ? " và hoàn cọc." : " (không hoàn cọc).");
             return RedirectToAction("Bookings");
@@ -527,7 +528,7 @@ namespace DatBanQuanAn.Controllers
             ViewBag.Top = (from c in db.ChiTietGoiMons
                            join g in db.DonGoiMons on c.DonGoiMonId equals g.Id
                            join m in db.MonAns on c.MonId equals m.Id
-                           where g.TrangThai == "DaXacNhan" && g.NgayTao >= d1 && g.NgayTao < endEx
+                           where g.TrangThai == "DaXacNhan" && c.TrangThai != "Huy" && g.NgayTao >= d1 && g.NgayTao < endEx
                            group c by m.Ten into grp
                            orderby grp.Sum(x => x.SoLuong) descending
                            select new NameCount { Ten = grp.Key, SoLuong = grp.Sum(x => x.SoLuong) }).Take(10).ToList();

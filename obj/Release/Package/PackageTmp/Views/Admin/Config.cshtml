@@ -1,0 +1,74 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@using DatBanQuanAn.Models
+@{ ViewBag.Title = "Cấu hình"; var cfg = (List<CauHinh>)ViewBag.Cfg; var coc = (List<CocRow>)ViewBag.Coc; var types = (List<LoaiBan>)ViewBag.Types; var cps = (List<MaGiamGia>)ViewBag.Coupons; }
+<h2>Cấu hình đặt bàn</h2>
+<div class="row">
+    <div class="col-md-6">
+        <h4>Thông số (BR2, BR5...)</h4>
+        <table class="table table-condensed">
+            @foreach (var r in cfg)
+            {
+                string label = r.Khoa == "GiuBanPhut" ? "Thời gian giữ bàn sau giờ hẹn (phút)" :
+                               r.Khoa == "KhoaBanPhut" ? "Khóa bàn tạm khi thanh toán (phút)" :
+                               r.Khoa == "GiuMonMangVeGio" ? "Giữ món mang về (giờ)" :
+                               r.Khoa == "ThoiLuongBanPhut" ? "Thời lượng dùng bữa mặc định (phút) – chỉ để tham khảo" : "Số tiền để được 1 điểm (đ)";
+                <tr>
+                    <td>@label</td>
+                    <td>
+                        @using (Html.BeginForm("SaveCfg", "Admin", FormMethod.Post, new { @class = "form-inline" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="khoa" value="@r.Khoa" />
+                            <input type="number" name="giaTri" min="1" value="@r.GiaTri" class="form-control input-sm" style="width:110px" />
+                            <button class="btn btn-xs btn-default">Lưu</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </table>
+        <p class="small text-muted">Lưu ý: thời lượng chiếm bàn khi kiểm tra trùng bàn đang cố định 120 phút trong mã nguồn (BookingService).</p>
+    </div>
+    <div class="col-md-6">
+        <h4>Mức đặt cọc theo loại bàn (BR1)</h4>
+        @using (Html.BeginForm("AddCoc", "Admin", FormMethod.Post, new { @class = "form-inline" }))
+        {
+            @Html.AntiForgeryToken()
+            <select name="loaiBanId" class="form-control">@foreach (var t in types)
+            {<option value="@t.Id">@t.Ten</option>}</select>
+            <input type="number" name="soTien" class="form-control" min="1000" step="1000" placeholder="Số tiền" required style="width:120px" />
+            <button class="btn btn-danger">Thêm mức cọc</button>
+        }
+        <table class="table table-condensed" style="margin-top:10px">
+            @foreach (var r in coc)
+            {
+                <tr><td>@r.Loai</td><td class="money">@Fmt.Money(r.SoTien)</td><td>@Html.Partial("_PostBtn", new PostBtn("DelCoc", "Admin", r.Id, "Xóa", "btn-danger"))</td></tr>
+            }
+        </table>
+    </div>
+</div>
+<hr />
+<h4>Mã giảm giá (mở rộng)</h4>
+@using (Html.BeginForm("AddCoupon", "Admin", FormMethod.Post, new { @class = "form-inline" }))
+{
+    @Html.AntiForgeryToken()
+    <input name="ma" class="form-control" placeholder="Mã" required />
+    <input type="number" name="phanTram" class="form-control" min="1" max="100" placeholder="% giảm" style="width:100px" />
+    <input type="number" name="soTien" class="form-control" min="1000" step="1000" placeholder="hoặc số tiền" style="width:130px" />
+    <input type="date" name="hanDung" class="form-control" required />
+    <button class="btn btn-danger">Tạo mã</button>
+}
+<table class="table table-condensed" style="margin-top:10px;max-width:700px">
+    <tr><th>Mã</th><th>Giảm</th><th>Hạn dùng</th><th>Trạng thái</th><th></th></tr>
+    @foreach (var r in cps)
+    {
+        <tr>
+            <td>@r.Ma</td>
+            <td>@(r.PhanTram != null ? r.PhanTram + "%" : Fmt.Money(r.SoTien))</td>
+            <td>@r.HanDung.ToString("dd/MM/yyyy")</td>
+            <td>@(r.HoatDong ? "Hoạt động" : "Vô hiệu")</td>
+            <td>@Html.Partial("_PostBtn", new PostBtn("ToggleCoupon", "Admin", r.Id, r.HoatDong ? "Vô hiệu hóa" : "Kích hoạt"))</td>
+        </tr>
+    }
+</table>

@@ -1,0 +1,17 @@
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@{ ViewBag.Title = "Đặt bàn thành công"; var d = ViewBag.D as DonDatBanView; }
+@if (d == null)
+{
+    <div class="alert alert-warning">Không tìm thấy đơn.</div>
+}
+else
+{
+    <div class="alert alert-success">
+        <h3>Đặt bàn thành công!</h3>
+        <p>Mã đơn của bạn: <b style="font-size:22px">@d.MaDon</b> (hãy lưu lại để tra cứu / hủy đơn).</p>
+        <p>Bàn @d.Ban · @Fmt.Date(d.NgayGio) · @d.SoNguoi người · Trạng thái: @Fmt.StatusBooking(d.TrangThai)</p>
+        <p>Xác nhận đã được gửi tới SĐT @d.SDT. Bàn được giữ tối đa 15 phút kể từ giờ hẹn.</p>
+    </div>
+}
+<a class="btn btn-default" href="@Url.Action("Index", "Home")">Về trang chủ</a>

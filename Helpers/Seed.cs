@@ -54,36 +54,41 @@ namespace DatBanQuanAn.Helpers
                 using (var db = new DatBanQuanAnEntities())
                 {
                     DateTime now = DateTime.Now;
+                    int giu = Cfg.Int("GiuBanPhut", 15);
+                    DateTime han = now.AddMinutes(-giu);
 
                     foreach (var d in db.DonDatBans.Where(x => x.TrangThai == "ChoThanhToan" && x.KhoaDen < now).ToList())
                         d.TrangThai = "DaHuy";
+                    db.SaveChanges();
 
-                    int giu = Cfg.Int("GiuBanPhut", 15);
-                    DateTime han = now.AddMinutes(-giu);
-                    var quaGio = db.DonDatBans
-                        .Where(x => (x.TrangThai == "DaCoc" || x.TrangThai == "DaThanhToan") && x.NgayGio < han)
-                        .ToList();
-                    foreach (var d in quaGio)
+                    int lead = Cfg.Int("BepTruocPhut", 20);
+                    if (lead > 0)
                     {
-                        d.TrangThai = "NoShow";
+                        DateTime toi = now.AddMinutes(lead);
+                        foreach (var d in db.DonDatBans.Where(x => x.HinhThuc == "KemMon" && x.TrangThai == "DaThanhToan"
+                                                                   && x.NgayGio >= han && x.NgayGio <= toi).ToList())
+                            KitchenLink.SendEarly(db, d);
+                    }
+
+                    foreach (var d in db.DonDatBans.Where(x => (x.TrangThai == "DaCoc" || x.TrangThai == "DaThanhToan") && x.NgayGio < han).ToList())
+                    {
+                        d.TrangThai = d.HinhThuc == "KemMon" ? "MangVe" : "NoShow";
                         if (d.KhachId != null)
                         {
                             var tk = db.TaiKhoans.Find(d.KhachId.Value);
                             if (tk != null) tk.SoLanNoShow++;
                         }
                     }
+                    db.SaveChanges();
+
                     int nhac = Cfg.Int("NhacTruocPhut", 60);
-                    DateTime toi = now.AddMinutes(nhac);
-                    var sapDen = db.DonDatBans
-                        .Where(x => (x.TrangThai == "DaCoc" || x.TrangThai == "DaThanhToan") && x.NgayGio > now && x.NgayGio <= toi)
-                        .ToList();
-                    foreach (var d in sapDen)
+                    DateTime toiNhac = now.AddMinutes(nhac);
+                    foreach (var d in db.DonDatBans.Where(x => (x.TrangThai == "DaCoc" || x.TrangThai == "DaThanhToan") && x.NgayGio > now && x.NgayGio <= toiNhac).ToList())
                     {
                         string dau = "[NHAC " + d.MaDon + "]";
                         if (db.ThongBaos.Any(t => t.NoiDung.StartsWith(dau))) continue;
                         BookingService.Notify(db, d.SDT, dau + " Nhắc lịch: đơn " + d.MaDon + " lúc " + d.NgayGio.ToString("HH:mm dd/MM") + ", " + d.SoNguoi + " người. Hẹn gặp bạn!");
                     }
-                    db.SaveChanges();
                 }
             }
             catch { }

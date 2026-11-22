@@ -28,9 +28,11 @@ namespace DatBanQuanAn.Models
         public bool DaHoaDon { get; set; }
         public Nullable<int> HoaDonId { get; set; }
         public System.DateTime NgayTao { get; set; }
+        public Nullable<int> DonDatBanId { get; set; }
     
         public virtual Ban Ban { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChiTietGoiMon> ChiTietGoiMons { get; set; }
+        public virtual DonDatBan DonDatBan { get; set; }
     }
 }

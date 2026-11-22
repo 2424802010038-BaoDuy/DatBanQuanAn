@@ -1,0 +1,78 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Models
+@{ ViewBag.Title = "Bếp / Bar"; var q = (List<KitchenRow>)ViewBag.Queue; var menu = (List<MonAn>)ViewBag.Menu; string loai = (string)ViewBag.Loai; }
+<meta http-equiv="refresh" content="20" />
+<h2>Hàng đợi chế biến</h2>
+<div class="btn-group" style="margin-bottom:10px">
+    <a class="btn @(loai == "" ? "btn-danger" : "btn-default")" href="@Url.Action("Index")">Tất cả</a>
+    <a class="btn @(loai == "Bep" ? "btn-danger" : "btn-default")" href="@Url.Action("Index", new { loai = "Bep" })">Bếp</a>
+    <a class="btn @(loai == "Bar" ? "btn-danger" : "btn-default")" href="@Url.Action("Index", new { loai = "Bar" })">Bar</a>
+</div>
+@if (q.Count == 0)
+{<p class="text-muted">Không có món nào cần chế biến.</p>}
+<table class="table table-striped">
+    @foreach (var r in q)
+    {
+        <tr>
+            <td>@r.NgayTao.ToString("HH:mm")</td>
+            <td><b>Bàn @r.Ban</b></td>
+            <td>@r.Ten × <b>@r.SoLuong</b> <span class="label label-default">@r.NoiCheBien</span> @(r.GhiChu == null ? "" : "– " + r.GhiChu)</td>
+            <td>@(r.TrangThai == "DangCheBien" ? "Đang chế biến" : "Chờ chế biến")</td>
+            <td>
+                @using (Html.BeginForm("SetStatus", "Kitchen", FormMethod.Post, new { style = "display:inline" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@r.Id" />
+                    <input type="hidden" name="loai" value="@loai" />
+                    if (r.TrangThai == "ChoCheBien")
+                    { <button name="st" value="DangCheBien" class="btn btn-xs btn-warning">Bắt đầu</button> }
+                    <button name="st" value="DaXong" class="btn btn-xs btn-success">Đã xong</button>
+                }
+                @if (r.TrangThai == "ChoCheBien")
+                {
+                    using (Html.BeginForm("CancelItem", "Kitchen", FormMethod.Post, new { style = "display:inline", onsubmit = "return confirm('Hủy món này?')" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@r.Id" />
+                        <input type="hidden" name="loai" value="@loai" />
+                        <button class="btn btn-xs btn-danger">Hủy</button>
+                    }
+                }
+            </td>
+        </tr>
+    }
+</table>
+<hr />
+<h4>Báo hết món / còn món</h4>
+<input id="timMon" type="search" class="form-control" style="max-width:360px;margin-bottom:10px" placeholder="Tìm món..." autocomplete="off" />
+<div id="dsMon">
+    @foreach (var m in menu)
+    {
+        using (Html.BeginForm("SoldOut", "Kitchen", FormMethod.Post, new { style = "display:inline-block;margin:3px", @class = "mon-item", data_ten = m.Ten }))
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="monId" value="@m.Id" />
+            <input type="hidden" name="loai" value="@loai" />
+            <button class="btn btn-sm @(m.ConMon ? "btn-default" : "btn-danger")">@m.Ten @(m.ConMon ? "" : "(HẾT)")</button>
+        }
+    }
+</div>
+<p id="khongThay" class="text-muted" style="display:none">Không tìm thấy món nào.</p>
+@section scripts {
+    <script>
+    function bd(s) { return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd'); }
+    document.addEventListener('DOMContentLoaded', function () {
+        var o = document.getElementById('timMon'), items = document.querySelectorAll('.mon-item'), none = document.getElementById('khongThay');
+        o.addEventListener('input', function () {
+            var k = bd(o.value.trim()), n = 0;
+            for (var i = 0; i < items.length; i++) {
+                var ok = k === '' || bd(items[i].getAttribute('data-ten')).indexOf(k) !== -1;
+                items[i].style.display = ok ? 'inline-block' : 'none';
+                if (ok) n++;
+            }
+            none.style.display = n === 0 ? '' : 'none';
+        });
+    });
+    </script>
+}

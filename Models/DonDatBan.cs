@@ -18,6 +18,7 @@ namespace DatBanQuanAn.Models
         public DonDatBan()
         {
             this.DatMonTruocs = new HashSet<DatMonTruoc>();
+            this.DonGoiMons = new HashSet<DonGoiMon>();
         }
     
         public int Id { get; set; }
@@ -40,5 +41,7 @@ namespace DatBanQuanAn.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<DatMonTruoc> DatMonTruocs { get; set; }
         public virtual TaiKhoan TaiKhoan { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<DonGoiMon> DonGoiMons { get; set; }
     }
 }

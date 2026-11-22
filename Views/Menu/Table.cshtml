@@ -19,7 +19,8 @@ else
         <table class="table table-condensed">
             @foreach (var o in orders)
             {
-                string tt = o.TrangThaiDon == "ChoXacNhan" ? "Chờ nhân viên xác nhận" :
+                string tt = o.TrangThai == "Huy" ? "Đã hủy" :
+                            o.TrangThaiDon == "ChoXacNhan" ? "Chờ nhân viên xác nhận" :
                             o.TrangThai == "ChoCheBien" ? "Chờ chế biến" :
                             o.TrangThai == "DangCheBien" ? "Đang chế biến" :
                             o.TrangThai == "DaXong" ? "Đã xong, sắp mang ra" : "Đã phục vụ";

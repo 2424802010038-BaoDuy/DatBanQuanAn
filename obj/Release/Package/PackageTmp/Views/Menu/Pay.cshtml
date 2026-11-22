@@ -1,0 +1,12 @@
+@using DatBanQuanAn.Helpers
+@{ ViewBag.Title = "Thanh toán đơn"; }
+<h2>Thanh toán đơn gọi món</h2>
+<p class="lead">Số tiền: <b>@Fmt.Money(ViewBag.Total)</b></p>
+<p class="text-muted small">Cổng thanh toán giả lập để chạy thử; khi triển khai thật thay bằng VNPay/MoMo.</p>
+@using (Html.BeginForm("PayResult", "Menu", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@ViewBag.Id" /><input type="hidden" name="token" value="@ViewBag.Token" />
+    <button name="result" value="ok" class="btn btn-success btn-lg">Thanh toán thành công (giả lập)</button>
+    <button name="result" value="fail" class="btn btn-default">Hủy / thất bại</button>
+}

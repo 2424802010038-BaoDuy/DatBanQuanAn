@@ -1,0 +1,55 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@{ ViewBag.Title = "Đơn đặt bàn"; var list = (List<StaffBookingRow>)ViewBag.List; var all = (List<TableOption>)ViewBag.AllTables; int giu = (int)ViewBag.GiuBan; }
+<h2>Đơn đặt bàn sắp tới</h2>
+<table class="table table-condensed">
+    <tr><th>Mã</th><th>Giờ hẹn</th><th>Bàn</th><th>Khách</th><th>Người</th><th>Hình thức</th><th>Trạng thái</th><th></th></tr>
+    @foreach (var d in list)
+    {
+        string st = d.TrangThai; int tre = d.Tre; bool qua = st != "MangVe" && tre >= giu;
+        <tr class="@(qua ? "late" : "")">
+            <td>@d.MaDon</td>
+            <td>@Fmt.Date(d.NgayGio)</td>
+            <td>@d.Ban</td>
+            <td>@d.HoTen – @d.SDT</td>
+            <td>@d.SoNguoi</td>
+            <td>@(d.HinhThuc == "KemMon" ? "Kèm món " + Fmt.Money(d.TienMon) : "Cọc " + Fmt.Money(d.TienCoc))</td>
+            <td>@Fmt.StatusBooking(st)@(qua ? " – QUÁ GIỜ " + tre + " phút" : "")</td>
+            <td>
+                @if (st == "MangVe")
+                {
+                    @Html.Partial("_PostBtn", new PostBtn("TakeAwayDone", "Staff", d.Id, "Đã giao món mang về"))
+                }
+                else
+                {
+                    @Html.Partial("_PostBtn", new PostBtn("CheckIn", "Staff", d.Id, "Check-in", "btn-success"))
+                    if (qua)
+                    {
+                        @Html.Partial("_PostBtn", new PostBtn("NoShow", "Staff", d.Id, "Xử lý no-show", "btn-danger"))
+                    }
+                    @Html.Partial("_PostBtn", new PostBtn("CancelBooking", "Staff", d.Id, "Hủy", "btn-default", "Hủy đơn này?"))
+                }
+            </td>
+        </tr>
+    }
+</table>
+<hr />
+<h4>Tạo đơn tại chỗ / qua điện thoại</h4>
+@using (Html.BeginForm("CounterBooking", "Staff", FormMethod.Post, new { @class = "form-inline" }))
+{
+    @Html.AntiForgeryToken()
+    <input name="hoTen" class="form-control" placeholder="Họ tên" required />
+    <input name="sdt" class="form-control" placeholder="SĐT" required />
+    <select name="banId" class="form-control">
+        @foreach (var b in all)
+        {
+            <option value="@b.Id">@b.KhuVuc – @b.Ten (@b.SucChua chỗ)</option>
+}
+    </select>
+    <input type="date" name="ngay" class="form-control" required value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+    <input type="time" name="gio" class="form-control" required />
+    <input type="number" name="soNguoi" class="form-control" style="width:80px" min="1" value="2" />
+    <input type="number" name="coc" class="form-control" style="width:120px" min="0" step="1000" value="50000" title="Tiền cọc thu tiền mặt" />
+    <button class="btn btn-danger">Tạo đơn</button>
+}

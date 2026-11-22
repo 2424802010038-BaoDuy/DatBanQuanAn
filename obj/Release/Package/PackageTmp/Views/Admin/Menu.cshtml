@@ -1,0 +1,36 @@
+@using System.Data
+@using DatBanQuanAn.Helpers
+@{ ViewBag.Title = "Thực đơn"; var list = (DataTable)ViewBag.List; var e = ViewBag.Edit as DataRow; }
+<h2>Quản lý thực đơn</h2>
+@using (Html.BeginForm("SaveMon", "Admin", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-inline", style = "margin-bottom:15px" }))
+{
+    @Html.AntiForgeryToken()
+    if (e != null) { <input type="hidden" name="id" value="@e["Id"]" /> }
+    <input name="ten" class="form-control" placeholder="Tên món" required value="@(e != null ? e["Ten"] : "")" />
+    <input name="danhMuc" class="form-control" placeholder="Danh mục" required value="@(e != null ? e["DanhMuc"] : "")" />
+    <input type="number" name="donGia" class="form-control" min="1000" step="1000" placeholder="Đơn giá" required style="width:120px" value="@(e != null ? Convert.ToInt32(e["DonGia"]).ToString() : "")" />
+    <select name="noiCheBien" class="form-control">
+        <option value="Bep" @(e != null && (string)e["NoiCheBien"] == "Bep" ? "selected" : "")>Bếp</option>
+        <option value="Bar" @(e != null && (string)e["NoiCheBien"] == "Bar" ? "selected" : "")>Bar</option>
+    </select>
+    <input name="moTa" class="form-control" placeholder="Mô tả" value="@(e != null ? e["MoTa"] : "")" />
+    <input type="file" name="hinh" accept="image/*" class="form-control" />
+    <button class="btn btn-danger">@(e != null ? "Cập nhật món" : "Thêm món")</button>
+    if (e != null) { <a class="btn btn-default" href="@Url.Action("Menu")">Hủy sửa</a> }
+}
+<table class="table table-striped">
+    <tr><th></th><th>Món</th><th>Danh mục</th><th>Giá</th><th>Nơi chế biến</th><th>Trạng thái</th><th></th></tr>
+    @foreach (DataRow r in list.Rows)
+    {
+        <tr>
+            <td>@if (r["HinhAnh"] != DBNull.Value) { <img src="~/Content/img/menu/@r["HinhAnh"]" style="height:40px" alt="" /> }</td>
+            <td>@r["Ten"]</td><td>@r["DanhMuc"]</td><td class="money">@Fmt.Money(r["DonGia"])</td><td>@r["NoiCheBien"]</td>
+            <td>@((bool)r["ConMon"] ? "Còn món" : "HẾT MÓN")</td>
+            <td>
+                <a class="btn btn-xs btn-default" href="@Url.Action("Menu", new { edit = r["Id"] })">Sửa</a>
+                @Html.Partial("_PostBtn", new PostBtn("ToggleMon", "Admin", r["Id"], (bool)r["ConMon"] ? "Báo hết" : "Còn món"))
+                @Html.Partial("_PostBtn", new PostBtn("DeleteMon", "Admin", r["Id"], "Xóa/Ẩn", "btn-danger", "Xóa món này?"))
+            </td>
+        </tr>
+    }
+</table>

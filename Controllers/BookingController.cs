@@ -270,6 +270,7 @@ namespace DatBanQuanAn.Controllers
 
             double hours = (d.NgayGio - DateTime.Now).TotalHours;
             int pct = hours >= 24 ? 100 : (hours >= 2 ? 50 : 0);
+            if (KitchenLink.CancelPending(db, d.Id)) pct = 0;
             decimal paid = d.HinhThuc == "KemMon" ? d.TienMon : d.TienCoc;
             decimal refund = Math.Round(paid * pct / 100m);
             d.TrangThai = "DaHuy";

@@ -1,0 +1,52 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@{ ViewBag.Title = "Đơn đặt bàn"; var list = ViewBag.List as List<DonDatBanView>; bool member = Session["Role"] as string == "KhachThanhVien"; }
+<h2>@(member ? "Lịch sử đặt bàn của tôi" : "Tra cứu đơn đặt bàn")</h2>
+@if (!member)
+{
+    <form method="get" class="form-inline" style="margin-bottom:15px">
+        <input name="sdt" class="form-control" placeholder="SĐT đã đặt" value="@ViewBag.Sdt" />
+        <input name="ma" class="form-control" placeholder="Mã đơn" value="@ViewBag.Ma" />
+        <button class="btn btn-danger">Tra cứu</button>
+    </form>
+}
+@if (list != null && list.Count == 0)
+{<div class="alert alert-info">Không có đơn nào.</div>}
+@if (list != null && list.Count > 0)
+{
+    <table class="table table-striped">
+        <tr><th>Mã</th><th>Bàn</th><th>Thời gian</th><th>Hình thức</th><th>Tiền</th><th>Trạng thái</th><th></th></tr>
+        @foreach (var d in list)
+        {
+            string st = d.TrangThai; bool act = st == "DaCoc" || st == "DaThanhToan";
+            <tr>
+                <td>@d.MaDon</td>
+                <td>@d.Ban</td>
+                <td>@Fmt.Date(d.NgayGio)</td>
+                <td>@(d.HinhThuc == "KemMon" ? "Kèm món" : "Đặt cọc")</td>
+                <td class="money">@Fmt.Money(d.HinhThuc == "KemMon" ? d.TienMon : d.TienCoc)</td>
+                <td>@Fmt.StatusBooking(st)</td>
+                <td>
+                    @if (act)
+                    {
+                        using (Html.BeginForm("Cancel", "Booking", FormMethod.Post, new { style = "display:inline", onsubmit = "return confirm('Hủy đơn? Mức hoàn: ≥24h 100%, 2-24h 50%, <2h không hoàn.')" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@d.Id" /><input type="hidden" name="sdt" value="@d.SDT" /><input type="hidden" name="ma" value="@d.MaDon" />
+                            <button class="btn btn-xs btn-danger">Hủy</button>
+                        }
+                        using (Html.BeginForm("ChangeTime", "Booking", FormMethod.Post, new { style = "display:inline" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@d.Id" /><input type="hidden" name="sdt" value="@d.SDT" /><input type="hidden" name="ma" value="@d.MaDon" />
+                            <input type="date" name="ngay" required style="width:130px" /> <input type="time" name="gio" required style="width:90px" />
+                            <button class="btn btn-xs btn-default">Đổi giờ</button>
+                        }
+                        <a class="btn btn-xs btn-default" href="@Url.Action("ChangeTable", new { id = d.Id, sdt = d.SDT, ma = d.MaDon })">Đổi bàn</a>
+                    }
+                </td>
+            </tr>
+        }
+    </table>
+}

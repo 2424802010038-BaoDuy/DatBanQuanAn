@@ -1,0 +1,83 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Helpers
+@using DatBanQuanAn.Models
+@{
+    ViewBag.Title = "Thông tin đặt bàn";
+    var ban = (Ban)ViewBag.Ban; var coc = (List<MucCoc>)ViewBag.Coc; var menu = ViewBag.Menu as List<MonAn>; var user = ViewBag.User as TaiKhoan;
+}
+<h2>Thông tin đặt bàn</h2>
+<p>Bàn <b>@ban.Ten</b> (@ViewBag.Loai, @ban.SucChua chỗ) – @ViewBag.KhuVuc · <b>@Fmt.Date(ViewBag.Dt)</b> · @ViewBag.SoNguoi người</p>
+@using (Html.BeginForm("Create", "Booking", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="banId" value="@ban.Id" />
+    <input type="hidden" name="ngay" value="@ViewBag.Ngay" />
+    <input type="hidden" name="gio" value="@ViewBag.Gio" />
+    <input type="hidden" name="soNguoi" value="@ViewBag.SoNguoi" />
+    <div class="row">
+        <div class="col-md-5">
+            <div class="form-group"><label>Họ tên</label><input name="hoTen" class="form-control" required value="@(user != null ? user.HoTen : "")" /></div>
+            <div class="form-group"><label>SĐT (Zalo)</label><input name="sdt" class="form-control" required value="@(user != null ? user.SDT : "")" /></div>
+            <div class="form-group"><label>Yêu cầu đặc biệt</label><textarea name="ghiChu" class="form-control" maxlength="300" placeholder="Trang trí tiệc, ghế trẻ em..."></textarea></div>
+        </div>
+        <div class="col-md-6 col-md-offset-1">
+            <div class="form-group">
+                <label>Hình thức</label>
+                <div class="radio"><label><input type="radio" name="hinhThuc" value="CocBan" checked /> Chỉ đặt bàn (đặt cọc, được trừ vào hóa đơn)</label></div>
+                @if (menu != null)
+                {
+                    <div class="radio"><label><input type="radio" name="hinhThuc" value="KemMon" /> Đặt bàn kèm món (thanh toán 100% tiền món)</label></div>
+                }
+                else
+                {
+                    <p class="text-muted small">Muốn đặt kèm món? @Html.ActionLink("Đăng nhập", "Login", "Account", new { returnUrl = Request.RawUrl }, null) trước.</p>
+                }
+            </div>
+            <div id="boxCoc" class="form-group">
+                <label>Chọn mức đặt cọc</label>
+                @{ bool first = true; }
+                @foreach (var c in coc)
+                {
+                    <div class="radio"><label><input type="radio" name="mucCocId" value="@c.Id" @(first ? "checked" : "") /> @Fmt.Money(c.SoTien)</label></div>
+                    first = false;
+                }
+            </div>
+        </div>
+    </div>
+    if (menu != null)
+    {
+        <div id="boxMon" style="display:none">
+            <h4>Chọn món</h4>
+            <table class="table table-condensed">
+                @foreach (var m in menu)
+                {
+                    <tr>
+                        <td>@m.DanhMuc</td>
+                        <td>@m.Ten</td>
+                        <td class="money">@Fmt.Money(m.DonGia)</td>
+                        <td><input type="number" min="0" max="50" value="0" name="@("qty_" + m.Id)" class="form-control input-sm" style="width:80px" /></td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+    <button class="btn btn-danger btn-lg">Tiếp tục thanh toán</button>
+    <a class="btn btn-default" href="@Url.Action("Index", new { ngay = ViewBag.Ngay, gio = ViewBag.Gio, soNguoi = ViewBag.SoNguoi })">Quay lại</a>
+}
+@section scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var radios = document.querySelectorAll('input[name=hinhThuc]');
+            var boxMon = document.getElementById('boxMon');
+            var boxCoc = document.getElementById('boxCoc');
+
+            function capNhat() {
+                var kem = document.querySelector('input[name=hinhThuc]:checked').value === 'KemMon';
+                if (boxMon) boxMon.style.display = kem ? '' : 'none';
+                if (boxCoc) boxCoc.style.display = kem ? 'none' : '';
+            }
+            for (var i = 0; i < radios.length; i++) radios[i].addEventListener('change', capNhat);
+            capNhat();
+        });
+    </script>
+}

@@ -1,0 +1,47 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@{ ViewBag.Title = "Đơn đặt bàn"; var list = (List<DonDatBanView>)ViewBag.List; string st = (string)ViewBag.St ?? ""; }
+<h2>Tất cả đơn đặt bàn</h2>
+@if (TempData["Ok"] != null)
+{<div class="alert alert-success">@TempData["Ok"]</div>}
+@if (TempData["Err"] != null)
+{<div class="alert alert-danger">@TempData["Err"]</div>}
+<form method="get" class="form-inline" style="margin-bottom:10px">
+    <input name="q" class="form-control" placeholder="Mã đơn hoặc SĐT" value="@ViewBag.Q" />
+    <select name="st" class="form-control">
+        <option value="">Tất cả trạng thái</option>
+        @foreach (var s in new[] { "ChoThanhToan", "DaCoc", "DaThanhToan", "DaCheckIn", "HoanThanh", "NoShow", "DaHuy", "MangVe" })
+        {
+            <option value="@s" @(st == s ? "selected" : "")>@Fmt.StatusBooking(s)</option>
+        }
+    </select>
+    <button class="btn btn-danger">Lọc</button>
+</form>
+<table class="table table-striped table-condensed">
+    <tr><th>Mã</th><th>Giờ hẹn</th><th>Bàn</th><th>Khách</th><th>Người</th><th>Hình thức</th><th>Trạng thái</th><th></th></tr>
+    @foreach (var d in list)
+    {
+        <tr>
+            <td>@d.MaDon</td>
+            <td>@Fmt.Date(d.NgayGio)</td>
+            <td>@d.Ban</td>
+            <td>@d.HoTen – @d.SDT</td>
+            <td>@d.SoNguoi</td>
+            <td>@(d.HinhThuc == "KemMon" ? "Kèm món " + Fmt.Money(d.TienMon) : "Cọc " + Fmt.Money(d.TienCoc))</td>
+            <td>@Fmt.StatusBooking(d.TrangThai)</td>
+            <td>
+                @if (d.TrangThai == "ChoThanhToan" || d.TrangThai == "DaCoc" || d.TrangThai == "DaThanhToan")
+                {
+                    using (Html.BeginForm("AdminCancel", "Admin", FormMethod.Post, new { style = "display:inline" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@d.Id" />
+                        <button name="hoanCoc" value="true" class="btn btn-xs btn-warning" onclick="return confirm('Hủy đơn và hoàn cọc?')">Hủy + hoàn cọc</button>
+                        <button name="hoanCoc" value="false" class="btn btn-xs btn-danger" onclick="return confirm('Hủy đơn, KHÔNG hoàn cọc?')">Hủy, giữ cọc</button>
+                    }
+                }
+            </td>
+        </tr>
+    }
+</table>

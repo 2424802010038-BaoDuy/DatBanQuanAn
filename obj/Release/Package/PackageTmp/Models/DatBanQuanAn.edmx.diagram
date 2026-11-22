@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="7485bac0a36042d89711b0b100e81056" Name="Diagram1">
+        <EntityTypeShape EntityType="DatBanQuanAnModel.Ban" Width="1.5" PointX="3" PointY="7.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DatBanQuanAnModel.CauHinh" Width="1.5" PointX="7.75" PointY="0.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DatBanQuanAnModel.ChiTietGoiMon" Width="1.5" PointX="7.5" PointY="11" IsExpanded="true" />
+        <EntityTypeShape EntityType="DatBanQuanAnModel.DatMonTruoc" Width="1.5" PointX="7.5" PointY="6.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="DatBanQuanAnModel.DonDatBan" Width="1.5" PointX="5.25" PointY="5.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="DatBanQuanAnModel.DonGoiMon" Width="1.5" PointX="5.25" PointY="10.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DatBanQuanAnModel.HoaDon" Width="1.5" PointX="5.25" PointY="14.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DatBanQuanAnModel.KhuVuc" Width="1.5" PointX="0.75" PointY="5.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DatBanQuanAnModel.LoaiBan" Width="1.5" PointX="0.75" PointY="8.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DatBanQuanAnModel.MaGiamGia" Width="1.5" PointX="9.75" PointY="0.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DatBanQuanAnModel.MonAn" Width="1.5" PointX="5.25" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DatBanQuanAnModel.MucCoc" Width="1.5" PointX="3" PointY="16.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DatBanQuanAnModel.TaiKhoan" Width="1.5" PointX="3" PointY="2.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DatBanQuanAnModel.ThanhToan" Width="1.5" PointX="9.75" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DatBanQuanAnModel.ThongBao" Width="1.5" PointX="9.75" PointY="7.875" IsExpanded="true" />
+        <AssociationConnector Association="DatBanQuanAnModel.FK__Ban__KhuVucId__45F365D3" ManuallyRouted="false" />
+        <AssociationConnector Association="DatBanQuanAnModel.FK__Ban__LoaiBanId__46E78A0C" ManuallyRouted="false" />
+        <AssociationConnector Association="DatBanQuanAnModel.FK__DonDatBan__BanId__571DF1D5" ManuallyRouted="false" />
+        <AssociationConnector Association="DatBanQuanAnModel.FK__DonGoiMon__BanId__60A75C0F" ManuallyRouted="false" />
+        <AssociationConnector Association="DatBanQuanAnModel.FK__HoaDon__BanId__72C60C4A" ManuallyRouted="false" />
+        <AssociationConnector Association="DatBanQuanAnModel.FK__ChiTietGo__DonGo__6754599E" ManuallyRouted="false" />
+        <AssociationConnector Association="DatBanQuanAnModel.FK__ChiTietGo__MonId__68487DD7" ManuallyRouted="false" />
+        <AssociationConnector Association="DatBanQuanAnModel.FK__DatMonTru__DonDa__5CD6CB2B" ManuallyRouted="false" />
+        <AssociationConnector Association="DatBanQuanAnModel.FK__DatMonTru__MonId__5DCAEF64" ManuallyRouted="false" />
+        <AssociationConnector Association="DatBanQuanAnModel.FK__DonDatBan__Khach__5629CD9C" ManuallyRouted="false" />
+        <AssociationConnector Association="DatBanQuanAnModel.FK__MucCoc__LoaiBanI__4CA06362" ManuallyRouted="false" />
+        <AssociationConnector Association="DatBanQuanAnModel.FK__DonGoiMon__DonDa__151B244E" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

@@ -1,0 +1,33 @@
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@{ ViewBag.Title = "Thanh toán"; var d = (DonDatBanView)ViewBag.D; bool kem = d.HinhThuc == "KemMon"; }
+<h2>Xem lại và thanh toán</h2>
+<div class="alert alert-warning">Bàn đang được giữ cho bạn trong <b id="cd">--:--</b>. Hết thời gian bàn sẽ tự mở khóa.</div>
+<table class="table" style="max-width:520px">
+    <tr><td>Mã đơn</td><td>@d.MaDon</td></tr>
+    <tr><td>Bàn</td><td>@d.Ban</td></tr>
+    <tr><td>Thời gian</td><td>@Fmt.Date(d.NgayGio)</td></tr>
+    <tr><td>Khách</td><td>@d.HoTen – @d.SDT</td></tr>
+    <tr><td>Hình thức</td><td>@(kem ? "Đặt kèm món (thanh toán 100% tiền món)" : "Đặt cọc giữ bàn")</td></tr>
+    <tr><td><b>Số tiền thanh toán</b></td><td><b>@Fmt.Money(kem ? d.TienMon : d.TienCoc)</b></td></tr>
+</table>
+<p class="text-muted small">Đây là cổng thanh toán giả lập để chạy thử. Khi triển khai thật, thay bằng chuyển hướng sang VNPay/MoMo (sandbox).</p>
+@using (Html.BeginForm("PayResult", "Booking", FormMethod.Post, new { style = "display:inline" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@d.Id" />
+    <button name="result" value="ok" class="btn btn-success btn-lg">Thanh toán thành công (giả lập)</button>
+    <button name="result" value="fail" class="btn btn-default">Hủy / thất bại</button>
+}
+@section scripts {
+    <script>
+    var left = @d.ConLai;
+    function tick() {
+        if (left <= 0) { location.href = '@Url.Action("Index")'; return; }
+        var m = Math.floor(left / 60), s = left % 60;
+        document.getElementById('cd').textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+        left--; setTimeout(tick, 1000);
+    }
+    tick();
+    </script>
+}

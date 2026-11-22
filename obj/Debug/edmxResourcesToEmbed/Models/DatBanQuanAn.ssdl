@@ -74,6 +74,7 @@
     <Property Name="DaHoaDon" Type="bit" Nullable="false" />
     <Property Name="HoaDonId" Type="int" />
     <Property Name="NgayTao" Type="datetime" Nullable="false" />
+    <Property Name="DonDatBanId" Type="int" />
   </EntityType>
   <EntityType Name="HoaDon">
     <Key>
@@ -294,6 +295,18 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="FK__DonGoiMon__DonDa__151B244E">
+    <End Role="DonDatBan" Type="Self.DonDatBan" Multiplicity="0..1" />
+    <End Role="DonGoiMon" Type="Self.DonGoiMon" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="DonDatBan">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="DonGoiMon">
+        <PropertyRef Name="DonDatBanId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
   <Association Name="FK__HoaDon__BanId__72C60C4A">
     <End Role="Ban" Type="Self.Ban" Multiplicity="1" />
     <End Role="HoaDon" Type="Self.HoaDon" Multiplicity="*" />
@@ -368,6 +381,10 @@
     </AssociationSet>
     <AssociationSet Name="FK__DonGoiMon__BanId__60A75C0F" Association="Self.FK__DonGoiMon__BanId__60A75C0F">
       <End Role="Ban" EntitySet="Ban" />
+      <End Role="DonGoiMon" EntitySet="DonGoiMon" />
+    </AssociationSet>
+    <AssociationSet Name="FK__DonGoiMon__DonDa__151B244E" Association="Self.FK__DonGoiMon__DonDa__151B244E">
+      <End Role="DonDatBan" EntitySet="DonDatBan" />
       <End Role="DonGoiMon" EntitySet="DonGoiMon" />
     </AssociationSet>
     <AssociationSet Name="FK__HoaDon__BanId__72C60C4A" Association="Self.FK__HoaDon__BanId__72C60C4A">

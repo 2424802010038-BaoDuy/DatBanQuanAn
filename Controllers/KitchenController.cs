@@ -75,5 +75,32 @@ namespace DatBanQuanAn.Controllers
             if (mon != null) { mon.ConMon = !mon.ConMon; db.SaveChanges(); }
             return RedirectToAction("Index", new { loai });
         }
+        [HttpPost]
+        public ActionResult CancelItem(int id, string loai)
+        {
+            var item = db.ChiTietGoiMons.FirstOrDefault(x => x.Id == id && x.TrangThai == "ChoCheBien");
+            if (item == null)
+                TempData["Err"] = "Món đã bắt đầu chế biến hoặc không còn, không thể hủy.";
+            else
+            {
+                item.TrangThai = "Huy";
+                var g = db.DonGoiMons.Find(item.DonGoiMonId);
+                if (g != null && g.DaThanhToan)
+                {
+                    db.ThanhToans.Add(new ThanhToan
+                    {
+                        DonGoiMonId = g.Id,
+                        Loai = "HoanCoc",
+                        SoTien = item.SoLuong * item.DonGia,
+                        PhuongThuc = "GiaLap",
+                        TrangThai = "ThanhCong",
+                        Ngay = DateTime.Now
+                    });
+                }
+                db.SaveChanges();
+                TempData["Ok"] = "Đã hủy món.";
+            }
+            return RedirectToAction("Index", new { loai });
+        }
     }
 }

@@ -1,5 +1,3 @@
-D:\hoc\Huong doi tuong\DatBanQuanAn\DatBanQuanAn\obj\Debug\DatBanQuanAn.csproj.AssemblyReference.cache
-D:\hoc\Huong doi tuong\DatBanQuanAn\DatBanQuanAn\obj\Debug\DatBanQuanAn.csproj.CoreCompileInputs.cache
 D:\hoc\Huong doi tuong\DatBanQuanAn\DatBanQuanAn\bin\DatBanQuanAn.dll.config
 D:\hoc\Huong doi tuong\DatBanQuanAn\DatBanQuanAn\bin\DatBanQuanAn.dll
 D:\hoc\Huong doi tuong\DatBanQuanAn\DatBanQuanAn\bin\DatBanQuanAn.pdb
@@ -79,6 +77,8 @@ D:\hoc\Huong doi tuong\DatBanQuanAn\DatBanQuanAn\bin\System.Web.WebPages.Razor.x
 D:\hoc\Huong doi tuong\DatBanQuanAn\DatBanQuanAn\bin\Newtonsoft.Json.xml
 D:\hoc\Huong doi tuong\DatBanQuanAn\DatBanQuanAn\bin\Antlr3.Runtime.pdb
 D:\hoc\Huong doi tuong\DatBanQuanAn\DatBanQuanAn\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+D:\hoc\Huong doi tuong\DatBanQuanAn\DatBanQuanAn\obj\Debug\DatBanQuanAn.csproj.AssemblyReference.cache
+D:\hoc\Huong doi tuong\DatBanQuanAn\DatBanQuanAn\obj\Debug\DatBanQuanAn.csproj.CoreCompileInputs.cache
 D:\hoc\Huong doi tuong\DatBanQuanAn\DatBanQuanAn\obj\Debug\DatBanQu.04722715.Up2Date
 D:\hoc\Huong doi tuong\DatBanQuanAn\DatBanQuanAn\obj\Debug\DatBanQuanAn.dll
 D:\hoc\Huong doi tuong\DatBanQuanAn\DatBanQuanAn\obj\Debug\DatBanQuanAn.pdb

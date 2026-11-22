@@ -73,6 +73,7 @@
     <NavigationProperty Name="Ban" Relationship="Self.FK__DonDatBan__BanId__571DF1D5" FromRole="DonDatBan" ToRole="Ban" />
     <NavigationProperty Name="DatMonTruocs" Relationship="Self.FK__DatMonTru__DonDa__5CD6CB2B" FromRole="DonDatBan" ToRole="DatMonTruoc" />
     <NavigationProperty Name="TaiKhoan" Relationship="Self.FK__DonDatBan__Khach__5629CD9C" FromRole="DonDatBan" ToRole="TaiKhoan" />
+    <NavigationProperty Name="DonGoiMons" Relationship="DatBanQuanAnModel.FK__DonGoiMon__DonDa__151B244E" FromRole="DonDatBan" ToRole="DonGoiMon" />
   </EntityType>
   <EntityType Name="DonGoiMon">
     <Key>
@@ -88,6 +89,8 @@
     <Property Name="NgayTao" Type="DateTime" Nullable="false" Precision="3" />
     <NavigationProperty Name="Ban" Relationship="Self.FK__DonGoiMon__BanId__60A75C0F" FromRole="DonGoiMon" ToRole="Ban" />
     <NavigationProperty Name="ChiTietGoiMons" Relationship="Self.FK__ChiTietGo__DonGo__6754599E" FromRole="DonGoiMon" ToRole="ChiTietGoiMon" />
+    <Property Name="DonDatBanId" Type="Int32" />
+    <NavigationProperty Name="DonDatBan" Relationship="DatBanQuanAnModel.FK__DonGoiMon__DonDa__151B244E" FromRole="DonGoiMon" ToRole="DonDatBan" />
   </EntityType>
   <EntityType Name="HoaDon">
     <Key>
@@ -400,5 +403,21 @@
       <End Role="LoaiBan" EntitySet="LoaiBans" />
       <End Role="MucCoc" EntitySet="MucCocs" />
     </AssociationSet>
+    <AssociationSet Name="FK__DonGoiMon__DonDa__151B244E" Association="DatBanQuanAnModel.FK__DonGoiMon__DonDa__151B244E">
+      <End Role="DonDatBan" EntitySet="DonDatBans" />
+      <End Role="DonGoiMon" EntitySet="DonGoiMons" />
+    </AssociationSet>
   </EntityContainer>
+  <Association Name="FK__DonGoiMon__DonDa__151B244E">
+    <End Type="DatBanQuanAnModel.DonDatBan" Role="DonDatBan" Multiplicity="0..1" />
+    <End Type="DatBanQuanAnModel.DonGoiMon" Role="DonGoiMon" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="DonDatBan">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="DonGoiMon">
+        <PropertyRef Name="DonDatBanId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema>

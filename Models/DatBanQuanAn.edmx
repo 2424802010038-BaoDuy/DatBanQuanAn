@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="DatBanQuanAnModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="DatBanQuanAnModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Ban">
           <Key>
             <PropertyRef Name="Id" />
@@ -79,6 +79,7 @@
           <Property Name="DaHoaDon" Type="bit" Nullable="false" />
           <Property Name="HoaDonId" Type="int" />
           <Property Name="NgayTao" Type="datetime" Nullable="false" />
+          <Property Name="DonDatBanId" Type="int" />
         </EntityType>
         <EntityType Name="HoaDon">
           <Key>
@@ -299,6 +300,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK__DonGoiMon__DonDa__151B244E">
+          <End Role="DonDatBan" Type="Self.DonDatBan" Multiplicity="0..1" />
+          <End Role="DonGoiMon" Type="Self.DonGoiMon" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DonDatBan">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="DonGoiMon">
+              <PropertyRef Name="DonDatBanId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK__HoaDon__BanId__72C60C4A">
           <End Role="Ban" Type="Self.Ban" Multiplicity="1" />
           <End Role="HoaDon" Type="Self.HoaDon" Multiplicity="*" />
@@ -375,6 +388,10 @@
             <End Role="Ban" EntitySet="Ban" />
             <End Role="DonGoiMon" EntitySet="DonGoiMon" />
           </AssociationSet>
+          <AssociationSet Name="FK__DonGoiMon__DonDa__151B244E" Association="Self.FK__DonGoiMon__DonDa__151B244E">
+            <End Role="DonDatBan" EntitySet="DonDatBan" />
+            <End Role="DonGoiMon" EntitySet="DonGoiMon" />
+          </AssociationSet>
           <AssociationSet Name="FK__HoaDon__BanId__72C60C4A" Association="Self.FK__HoaDon__BanId__72C60C4A">
             <End Role="Ban" EntitySet="Ban" />
             <End Role="HoaDon" EntitySet="HoaDon" />
@@ -384,8 +401,7 @@
             <End Role="MucCoc" EntitySet="MucCoc" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="DatBanQuanAnModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -462,6 +478,7 @@
           <NavigationProperty Name="Ban" Relationship="Self.FK__DonDatBan__BanId__571DF1D5" FromRole="DonDatBan" ToRole="Ban" />
           <NavigationProperty Name="DatMonTruocs" Relationship="Self.FK__DatMonTru__DonDa__5CD6CB2B" FromRole="DonDatBan" ToRole="DatMonTruoc" />
           <NavigationProperty Name="TaiKhoan" Relationship="Self.FK__DonDatBan__Khach__5629CD9C" FromRole="DonDatBan" ToRole="TaiKhoan" />
+          <NavigationProperty Name="DonGoiMons" Relationship="DatBanQuanAnModel.FK__DonGoiMon__DonDa__151B244E" FromRole="DonDatBan" ToRole="DonGoiMon" />
         </EntityType>
         <EntityType Name="DonGoiMon">
           <Key>
@@ -477,6 +494,8 @@
           <Property Name="NgayTao" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="Ban" Relationship="Self.FK__DonGoiMon__BanId__60A75C0F" FromRole="DonGoiMon" ToRole="Ban" />
           <NavigationProperty Name="ChiTietGoiMons" Relationship="Self.FK__ChiTietGo__DonGo__6754599E" FromRole="DonGoiMon" ToRole="ChiTietGoiMon" />
+          <Property Name="DonDatBanId" Type="Int32" />
+          <NavigationProperty Name="DonDatBan" Relationship="DatBanQuanAnModel.FK__DonGoiMon__DonDa__151B244E" FromRole="DonGoiMon" ToRole="DonDatBan" />
         </EntityType>
         <EntityType Name="HoaDon">
           <Key>
@@ -789,7 +808,23 @@
             <End Role="LoaiBan" EntitySet="LoaiBans" />
             <End Role="MucCoc" EntitySet="MucCocs" />
           </AssociationSet>
+          <AssociationSet Name="FK__DonGoiMon__DonDa__151B244E" Association="DatBanQuanAnModel.FK__DonGoiMon__DonDa__151B244E">
+            <End Role="DonDatBan" EntitySet="DonDatBans" />
+            <End Role="DonGoiMon" EntitySet="DonGoiMons" />
+          </AssociationSet>
         </EntityContainer>
+        <Association Name="FK__DonGoiMon__DonDa__151B244E">
+          <End Type="DatBanQuanAnModel.DonDatBan" Role="DonDatBan" Multiplicity="0..1" />
+          <End Type="DatBanQuanAnModel.DonGoiMon" Role="DonGoiMon" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DonDatBan">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="DonGoiMon">
+              <PropertyRef Name="DonDatBanId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -866,6 +901,7 @@
           <EntitySetMapping Name="DonGoiMons">
             <EntityTypeMapping TypeName="DatBanQuanAnModel.DonGoiMon">
               <MappingFragment StoreEntitySet="DonGoiMon">
+                <ScalarProperty Name="DonDatBanId" ColumnName="DonDatBanId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="BanId" ColumnName="BanId" />
                 <ScalarProperty Name="HinhThucTT" ColumnName="HinhThucTT" />

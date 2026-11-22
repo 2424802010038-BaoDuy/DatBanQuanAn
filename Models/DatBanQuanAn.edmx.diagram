@@ -31,6 +31,7 @@
         <AssociationConnector Association="DatBanQuanAnModel.FK__DatMonTru__MonId__5DCAEF64" ManuallyRouted="false" />
         <AssociationConnector Association="DatBanQuanAnModel.FK__DonDatBan__Khach__5629CD9C" ManuallyRouted="false" />
         <AssociationConnector Association="DatBanQuanAnModel.FK__MucCoc__LoaiBanI__4CA06362" ManuallyRouted="false" />
+        <AssociationConnector Association="DatBanQuanAnModel.FK__DonGoiMon__DonDa__151B244E" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

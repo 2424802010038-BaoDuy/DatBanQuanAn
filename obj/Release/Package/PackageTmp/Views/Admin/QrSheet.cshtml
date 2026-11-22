@@ -1,0 +1,8 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Controllers
+@{ ViewBag.Title = "Mã QR các bàn"; var list = (List<AdminTableRow>)ViewBag.List; }
+<p class="no-print"><button class="btn btn-danger" onclick="window.print()">In</button> <small class="text-muted">Mẹo: nếu khách quét bằng điện thoại, hãy mở trang quản trị bằng địa chỉ IP/tên miền của máy chủ (không dùng localhost) để QR hoạt động.</small></p>
+@foreach (var r in list)
+{
+    <div class="qr-item"><img src="@Url.Action("Qr", new { id = r.Id })" alt="QR" /><h4>Bàn @r.Ten</h4><small>@r.KhuVuc – Quét để gọi món</small></div>
+}

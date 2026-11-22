@@ -109,6 +109,44 @@ namespace DatBanQuanAn.Controllers
             TempData["Ok"] = "Đăng ký thành công. Mời bạn đăng nhập.";
             return RedirectToAction("Login");
         }
+        public ActionResult ChangePass() { return View(); }
+
+        [HttpPost]
+        public ActionResult ChangePass(string user, string cu, string moi, string xacNhan)
+        {
+            ViewBag.User = user;
+            if (string.IsNullOrWhiteSpace(user) || string.IsNullOrEmpty(cu) || string.IsNullOrEmpty(moi))
+            { ViewBag.Error = "Vui lòng nhập đầy đủ thông tin."; return View(); }
+            if (moi.Length < 8) { ViewBag.Error = "Mật khẩu mới phải có ít nhất 8 ký tự."; return View(); }
+            if (moi != xacNhan) { ViewBag.Error = "Mật khẩu xác nhận không khớp."; return View(); }
+            if (moi == cu) { ViewBag.Error = "Mật khẩu mới phải khác mật khẩu cũ."; return View(); }
+
+            user = user.Trim();
+            var u = db.TaiKhoans.FirstOrDefault(t => t.SDT == user || t.Email == user || t.TenDangNhap == user);
+            if (u == null) { ViewBag.Error = "Tài khoản hoặc mật khẩu cũ không đúng."; return View(); }
+            if (!u.TrangThai) { ViewBag.Error = "Tài khoản đang bị khóa. Vui lòng liên hệ Quản lý."; return View(); }
+            if (u.KhoaDen != null && u.KhoaDen > DateTime.Now)
+            { ViewBag.Error = "Bạn nhập sai quá 5 lần. Tạm khóa 15 phút."; return View(); }
+
+            if (!Security.Verify(cu, u.Salt, u.MatKhauHash))
+            {
+                u.SoLanSai++;
+                if (u.SoLanSai >= 5) { u.SoLanSai = 0; u.KhoaDen = DateTime.Now.AddMinutes(15); }
+                db.SaveChanges();
+                ViewBag.Error = "Tài khoản hoặc mật khẩu cũ không đúng.";
+                return View();
+            }
+
+            var salt = Security.NewSalt();
+            u.MatKhauHash = Security.Hash(moi, salt);
+            u.Salt = salt;
+            u.BatDoiMatKhau = false;
+            u.SoLanSai = 0; u.KhoaDen = null;
+            db.SaveChanges();
+
+            TempData["Ok"] = "Đã đổi mật khẩu. Mời bạn đăng nhập bằng mật khẩu mới.";
+            return RedirectToAction("Login");
+        }
 
         [Role("KhachThanhVien", "PhucVu", "Bep", "QuanLy")]
         public ActionResult Profile()

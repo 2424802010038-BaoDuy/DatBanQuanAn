@@ -230,14 +230,7 @@ namespace DatBanQuanAn.Controllers
             {
                 d.TrangThai = "DaCheckIn";
                 ban.TrangThai = "DangCoKhach";
-                if (d.HinhThuc == "KemMon")
-                {
-                    var goi = new DonGoiMon { BanId = d.BanId, HinhThucTT = "Online", DaThanhToan = true, TrangThai = "DaXacNhan", DaHoaDon = false, NgayTao = DateTime.Now };
-                    db.DonGoiMons.Add(goi);
-                    db.SaveChanges();
-                    foreach (var mon in db.DatMonTruocs.Where(x => x.DonDatBanId == id).ToList())
-                        db.ChiTietGoiMons.Add(new ChiTietGoiMon { DonGoiMonId = goi.Id, MonId = mon.MonId, SoLuong = mon.SoLuong, DonGia = mon.DonGia, TrangThai = "ChoCheBien" });
-                }
+                if (d.HinhThuc == "KemMon") KitchenLink.AttachAtCheckIn(db, d);
                 db.SaveChanges();
                 tx.Commit();
             }
@@ -299,6 +292,7 @@ namespace DatBanQuanAn.Controllers
             if (d != null)
             {
                 d.TrangThai = "DaHuy";
+                KitchenLink.CancelPending(db, d.Id);
                 db.SaveChanges();
                 TempData["Ok"] = "Đã hủy đơn " + d.MaDon + ". Hoàn tiền xử lý theo thỏa thuận với khách.";
             }
@@ -367,7 +361,7 @@ namespace DatBanQuanAn.Controllers
             bi.Items = (from c in db.ChiTietGoiMons
                         join g in db.DonGoiMons on c.DonGoiMonId equals g.Id
                         join m in db.MonAns on c.MonId equals m.Id
-                        where g.BanId == banId && !g.DaHoaDon && g.TrangThai == "DaXacNhan"
+                        where g.BanId == banId && !g.DaHoaDon && g.TrangThai == "DaXacNhan" && c.TrangThai != "Huy"
                         orderby g.NgayTao, c.Id
                         select new BillItemRow { Ten = m.Ten, SoLuong = c.SoLuong, DonGia = c.DonGia, DaThanhToan = g.DaThanhToan }).ToList();
             foreach (var r in bi.Items)
@@ -476,7 +470,7 @@ namespace DatBanQuanAn.Controllers
             ViewBag.Items = (from c in db.ChiTietGoiMons
                              join g in db.DonGoiMons on c.DonGoiMonId equals g.Id
                              join m in db.MonAns on c.MonId equals m.Id
-                             where g.HoaDonId == id
+                             where g.HoaDonId == id && c.TrangThai != "Huy"
                              orderby c.Id
                              select new BillItemRow { Ten = m.Ten, SoLuong = c.SoLuong, DonGia = c.DonGia }).ToList();
             return View();

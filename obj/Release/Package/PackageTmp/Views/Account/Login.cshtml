@@ -1,0 +1,17 @@
+@{ ViewBag.Title = "Đăng nhập"; }
+<div class="row"><div class="col-md-5 col-md-offset-3">
+    <h2>Đăng nhập</h2>
+    @if (ViewBag.Error != null)
+    {<div class="alert alert-danger">@ViewBag.Error</div>}
+    @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+        <div class="form-group"><label>SĐT / Email / Tên đăng nhập</label><input name="user" class="form-control" autofocus /></div>
+        <div class="form-group"><label>Mật khẩu</label><input type="password" name="password" class="form-control" /></div>
+        <button class="btn btn-danger">Đăng nhập</button>
+        <a class="btn btn-default" href="@Url.Action("Register")">Đăng ký thành viên</a>
+        <p style="margin-top:12px"><a href="@Url.Action("ChangePass", "Account")">Đổi mật khẩu</a></p>
+    }
+    <hr /><p class="text-muted small">Tài khoản mẫu: quanly / Admin@123 · phucvu / Phucvu@123 · bep / Bep@12345 · khách: 0900000004 / Khach@123</p>
+</div></div>

@@ -1,0 +1,29 @@
+@using System.Collections.Generic
+@using DatBanQuanAn.Controllers
+@using DatBanQuanAn.Helpers
+@using DatBanQuanAn.Models
+@{ ViewBag.Title = "In hóa đơn"; var h = (HoaDon)ViewBag.H; var items = (List<BillItemRow>)ViewBag.Items; }
+<div class="inv">
+    <h3 class="text-center">QUÁN ĂN</h3>
+    <p class="text-center">HÓA ĐƠN @h.MaHD<br />@Fmt.Date(h.NgayTao) · Bàn @ViewBag.Ban</p>
+    <hr />
+    <table style="width:100%">
+        @foreach (var r in items)
+        {
+            <tr><td>@r.Ten × @r.SoLuong</td><td style="text-align:right">@Fmt.Money(r.SoLuong * r.DonGia)</td></tr>
+        }
+    </table>
+    <hr />
+    <table style="width:100%">
+        <tr><td>Tổng tiền</td><td style="text-align:right">@Fmt.Money(h.TongTien)</td></tr>
+        <tr><td>Giảm giá @(h.MaGiamGia == null ? "" : "(" + h.MaGiamGia + ")")</td><td style="text-align:right">- @Fmt.Money(h.GiamGia)</td></tr>
+        <tr><td>Đã thanh toán trước (món)</td><td style="text-align:right">- @Fmt.Money(h.DaTra)</td></tr>
+        <tr><td>Tiền cọc</td><td style="text-align:right">- @Fmt.Money(h.TienCoc)</td></tr>
+        <tr><td><b>Thu thêm</b></td><td style="text-align:right"><b>@Fmt.Money(h.ConPhaiTra)</b></td></tr>
+    </table>
+    <p class="text-center">Cảm ơn quý khách!</p>
+</div>
+<p class="text-center no-print" style="margin-top:15px">
+    <button class="btn btn-danger" onclick="window.print()">In hóa đơn</button>
+    <a class="btn btn-default" href="@Url.Action("Tables", "Staff")">Về sơ đồ bàn</a>
+</p>
