@@ -1,0 +1,33 @@
+﻿@using System.Collections.Generic
+@using DatBanQuanAn.Models
+@{
+    ViewBag.Title = "Quên mã đơn";
+    var found = ViewBag.Found as List<DonDatBan>;
+}
+<h2>Quên mã đơn</h2>
+<p class="text-muted">Nhập số điện thoại đã dùng khi đặt bàn và ngày bạn hẹn đến.</p>
+
+@using (Html.BeginForm("Forgot", "Booking", FormMethod.Post, new { @class = "row g-2 mb-3" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="col-auto"><input name="sdt" class="form-control" placeholder="Số điện thoại" required value="@ViewBag.Sdt" /></div>
+    <div class="col-auto"><input name="ngay" type="date" class="form-control" required /></div>
+    <div class="col-auto"><button class="btn btn-danger">Tìm đơn</button></div>
+}
+
+@if (found != null)
+{
+    <table class="table table-striped">
+        <tr><th>Mã đơn</th><th>Giờ</th><th>Số người</th><th>Trạng thái</th><th></th></tr>
+        @foreach (var d in found)
+        {
+            <tr>
+                <td><b>@d.MaDon</b></td>
+                <td>@d.NgayGio.ToString("HH:mm dd/MM/yyyy")</td>
+                <td>@d.SoNguoi</td>
+                <td>@d.TrangThai</td>
+                <td><a class="btn btn-sm btn-outline-danger" href="@Url.Action("Lookup", "Booking", new { sdt = d.SDT, maDon = d.MaDon })">Xem chi tiết</a></td>
+            </tr>
+        }
+    </table>
+}

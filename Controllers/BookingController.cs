@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using DatBanQuanAn.Helpers;
 using DatBanQuanAn.Models;
-using System.Linq;
 
 namespace DatBanQuanAn.Controllers
 {
@@ -41,6 +40,8 @@ namespace DatBanQuanAn.Controllers
 
     public class BookingController : Controller
     {
+        static bool LaQuaKhu(DateTime dt) { return dt <= DateTime.Now; }
+        const string MsgQuaKhu = "Không thể đặt bàn vào ngày giờ đã qua. Vui lòng chọn thời điểm khác.";
         static readonly Regex PhoneRx = new Regex(@"^0\d{9,10}$");
 
         DatBanQuanAnEntities db = new DatBanQuanAnEntities();
@@ -84,8 +85,9 @@ namespace DatBanQuanAn.Controllers
 
         public ActionResult Index(string ngay, string gio, int? soNguoi, int? khuVucId, int? loaiBanId)
         {
-            if (string.IsNullOrEmpty(ngay)) ngay = DateTime.Now.ToString("yyyy-MM-dd");
-            if (string.IsNullOrEmpty(gio)) gio = DateTime.Now.AddHours(1).ToString("HH") + ":00";
+            var m = DateTime.Now.AddHours(1);
+            if (string.IsNullOrEmpty(ngay)) ngay = m.ToString("yyyy-MM-dd");
+            if (string.IsNullOrEmpty(gio)) gio = m.ToString("HH") + ":00";
             int n = soNguoi ?? 2;
             ViewBag.Ngay = ngay; ViewBag.Gio = gio; ViewBag.SoNguoi = n; ViewBag.KhuVucId = khuVucId; ViewBag.LoaiBanId = loaiBanId;
             ViewBag.Types = db.LoaiBans.OrderBy(x => x.Id).ToList();
@@ -93,7 +95,7 @@ namespace DatBanQuanAn.Controllers
             if (!TryDt(ngay, gio, out dt)) { ViewBag.Err = "Ngày giờ không hợp lệ."; return View(); }
             if (dt < DateTime.Now) { ViewBag.Err = "Vui lòng chọn thời điểm trong tương lai."; return View(); }
             if (n < 1 || n > 50) { ViewBag.Err = "Số người từ 1 đến 50."; return View(); }
-
+            if (LaQuaKhu(dt)) { TempData["Err"] = MsgQuaKhu; return View(); }
             string loaiTen = null;
             if (loaiBanId.HasValue)
             {
@@ -117,6 +119,7 @@ namespace DatBanQuanAn.Controllers
         {
             DateTime dt;
             if (!TryDt(ngay, gio, out dt) || dt < DateTime.Now) { TempData["Err"] = "Thời gian không hợp lệ."; return RedirectToAction("Index"); }
+            if (LaQuaKhu(dt)) { TempData["Err"] = MsgQuaKhu; return RedirectToAction("Index"); }
             var ban = db.Bans.FirstOrDefault(x => x.Id == banId && !x.Xoa);
             if (ban == null || ban.SucChua < soNguoi)
             { TempData["Err"] = "Bàn không hợp lệ."; return RedirectToAction("Index", new { ngay, gio, soNguoi }); }
@@ -373,6 +376,31 @@ namespace DatBanQuanAn.Controllers
                 }
             }
             return RedirectToAction("Lookup", new { sdt, ma });
+        }
+        [HttpGet]
+        public ActionResult Forgot() { return View(); }
+
+        [HttpPost]
+        public ActionResult Forgot(string sdt, DateTime? ngay)
+        {
+            sdt = (sdt ?? "").Trim();
+            if (sdt == "" || ngay == null)
+            {
+                TempData["Err"] = "Vui lòng nhập số điện thoại và ngày đã hẹn.";
+                return View();
+            }
+            DateTime d0 = ngay.Value.Date, d1 = d0.AddDays(1);
+            var list = db.DonDatBans
+                .Where(x => x.SDT == sdt && x.NgayGio >= d0 && x.NgayGio < d1)
+                .OrderBy(x => x.NgayGio).ToList();
+            if (list.Count == 0)
+            {
+                TempData["Err"] = "Không tìm thấy đơn nào khớp. Kiểm tra lại số điện thoại và ngày hẹn.";
+                return View();
+            }
+            ViewBag.Found = list;
+            ViewBag.Sdt = sdt;
+            return View();
         }
     }
 }

@@ -9,6 +9,7 @@
         <input name="sdt" class="form-control" placeholder="SĐT đã đặt" value="@ViewBag.Sdt" />
         <input name="ma" class="form-control" placeholder="Mã đơn" value="@ViewBag.Ma" />
         <button class="btn btn-danger">Tra cứu</button>
+        <p style="margin-top:10px"><a href="@Url.Action("Forgot", "Booking")">Quên mã đơn?</a></p>
     </form>
 }
 @if (list != null && list.Count == 0)

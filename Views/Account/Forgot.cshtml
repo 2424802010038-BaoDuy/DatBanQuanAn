@@ -1,0 +1,13 @@
+﻿@{ ViewBag.Title = "Quên mật khẩu"; }
+<h2>Quên mật khẩu</h2>
+<p class="text-muted">Nhập SĐT, email hoặc tên đăng nhập. Hệ thống sẽ gửi link đặt lại mật khẩu vào email của tài khoản.</p>
+@using (Html.BeginForm("Forgot", "Account", FormMethod.Post, new { style = "max-width:380px" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="mb-3">
+        <label>SĐT / Email / Tên đăng nhập</label>
+        <input name="dinhDanh" class="form-control" required />
+    </div>
+    <button class="btn btn-danger">Gửi link</button>
+    <a class="btn btn-outline-secondary" href="@Url.Action("Login", "Account")">Quay lại đăng nhập</a>
+}

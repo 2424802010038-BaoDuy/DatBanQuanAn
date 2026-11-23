@@ -311,6 +311,9 @@
     <Content Include="Views\Staff\Tables.cshtml" />
     <Content Include="Views\Booking\ChangeTable.cshtml" />
     <Content Include="Views\Account\ChangePass.cshtml" />
+    <Content Include="Views\Booking\Forgot.cshtml" />
+    <Content Include="Views\Account\Forgot.cshtml" />
+    <Content Include="Views\Account\ResetPass.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

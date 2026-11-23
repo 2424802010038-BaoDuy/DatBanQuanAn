@@ -10,7 +10,7 @@
 @if (ViewBag.Err != null)
 {<div class="alert alert-danger">@ViewBag.Err</div>}
 <form method="get" action="@Url.Action("Index")" class="form-inline" style="margin-bottom:15px">
-    <label>Ngày</label> <input type="date" name="ngay" class="form-control" value="@ViewBag.Ngay" required />
+    <label>Ngày</label> <input type="date" name="ngay" id="ngay" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")" value="@ViewBag.Ngay" required />
     <label>Giờ</label> <input type="time" name="gio" class="form-control" value="@ViewBag.Gio" required />
     <label>Số người</label> <input type="number" name="soNguoi" min="1" max="50" class="form-control" style="width:80px" value="@ViewBag.SoNguoi" />
     <label>Loại bàn</label>
@@ -66,3 +66,22 @@
         <button class="btn btn-danger">Tiếp tục</button>
     </form>
 }
+<script>
+    (function () {
+        var f = document.getElementById('ngay');
+        var g = document.querySelector('input[name="gio"]');
+        if (!f || !g) return;
+        function p(n) { return (n < 10 ? '0' : '') + n; }
+        function capNhat() {
+            var now = new Date();
+            var homNay = now.getFullYear() + '-' + p(now.getMonth() + 1) + '-' + p(now.getDate());
+            g.min = (f.value === homNay) ? (p(now.getHours()) + ':' + p(now.getMinutes())) : '';
+        }
+        f.addEventListener('change', capNhat);
+        capNhat();
+        g.form.addEventListener('submit', function (e) {
+            var n = new Date(), v = new Date(f.value + 'T' + g.value);
+            if (v <= n) { e.preventDefault(); alert('Không thể đặt bàn vào ngày giờ đã qua.'); }
+        });
+    })();
+</script>

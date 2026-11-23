@@ -4,6 +4,8 @@ using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using DatBanQuanAn.Helpers;
 using DatBanQuanAn.Models;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace DatBanQuanAn.Controllers
 {
@@ -109,6 +111,7 @@ namespace DatBanQuanAn.Controllers
             TempData["Ok"] = "Đăng ký thành công. Mời bạn đăng nhập.";
             return RedirectToAction("Login");
         }
+
         public ActionResult ChangePass() { return View(); }
 
         [HttpPost]
@@ -145,6 +148,100 @@ namespace DatBanQuanAn.Controllers
             db.SaveChanges();
 
             TempData["Ok"] = "Đã đổi mật khẩu. Mời bạn đăng nhập bằng mật khẩu mới.";
+            return RedirectToAction("Login");
+        }
+
+        const string ResetSecret = "Nhom9-DatBanQuanAn-k8Xp2Qw7LmZ4vT9r-2026";
+
+        static string Sign(string data, TaiKhoan tk)
+        {
+            using (var h = new HMACSHA256(Encoding.UTF8.GetBytes(ResetSecret)))
+            {
+                var b = h.ComputeHash(Encoding.UTF8.GetBytes(data + "|" + tk.MatKhauHash));
+                return BitConverter.ToString(b).Replace("-", "").ToLower();
+            }
+        }
+
+        static string MakeToken(TaiKhoan tk)
+        {
+            string data = tk.Id + "." + DateTime.UtcNow.AddMinutes(30).Ticks;
+            return data + "." + Sign(data, tk);
+        }
+
+        TaiKhoan CheckToken(string t)
+        {
+            if (string.IsNullOrEmpty(t)) return null;
+            var p = t.Split('.');
+            if (p.Length != 3) return null;
+            int id; long exp;
+            if (!int.TryParse(p[0], out id) || !long.TryParse(p[1], out exp)) return null;
+            if (exp < DateTime.UtcNow.Ticks) return null;
+            var tk = db.TaiKhoans.Find(id);
+            if (tk == null || !tk.TrangThai) return null;
+            if (Sign(p[0] + "." + p[1], tk) != p[2]) return null;
+            return tk;
+        }
+
+        [HttpGet]
+        public ActionResult Forgot() { return View(); }
+
+        [HttpPost]
+        public ActionResult Forgot(string dinhDanh)
+        {
+            dinhDanh = (dinhDanh ?? "").Trim();
+            if (dinhDanh != "")
+            {
+                var tk = db.TaiKhoans.FirstOrDefault(x => x.Email == dinhDanh || x.SDT == dinhDanh || x.TenDangNhap == dinhDanh);
+                if (tk != null && tk.TrangThai && !string.IsNullOrWhiteSpace(tk.Email))
+                {
+                    string link = Url.Action("ResetPass", "Account", new { t = MakeToken(tk) }, Request.Url.Scheme);
+                    Mailer.SendAsync(tk.Email, "Đặt lại mật khẩu",
+                        "Xin chào " + tk.HoTen + ",\n\nBấm vào link sau để đặt lại mật khẩu (hiệu lực 30 phút):\n" + link +
+                        "\n\nNếu bạn không yêu cầu, hãy bỏ qua email này.");
+                }
+            }
+            TempData["Ok"] = "Nếu tài khoản tồn tại và có email, hệ thống đã gửi link đặt lại mật khẩu. Kiểm tra hộp thư (cả mục Spam).";
+            return RedirectToAction("Login");
+        }
+
+        [HttpGet]
+        public ActionResult ResetPass(string t)
+        {
+            if (CheckToken(t) == null)
+            {
+                TempData["Err"] = "Link không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu lại.";
+                return RedirectToAction("Forgot");
+            }
+            ViewBag.T = t;
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult ResetPass(string t, string matKhauMoi, string nhapLai)
+        {
+            var tk = CheckToken(t);
+            if (tk == null)
+            {
+                TempData["Err"] = "Link không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu lại.";
+                return RedirectToAction("Forgot");
+            }
+            if (string.IsNullOrEmpty(matKhauMoi) || matKhauMoi.Length < 8)
+            {
+                TempData["Err"] = "Mật khẩu mới phải từ 8 ký tự.";
+                ViewBag.T = t; return View();
+            }
+            if (matKhauMoi != nhapLai)
+            {
+                TempData["Err"] = "Hai lần nhập mật khẩu không khớp.";
+                ViewBag.T = t; return View();
+            }
+            tk.Salt = Security.NewSalt();
+            tk.MatKhauHash = Security.Hash(matKhauMoi, tk.Salt);
+            tk.SoLanSai = 0;
+            tk.KhoaDen = null;
+            tk.BatDoiMatKhau = false;
+            db.SaveChanges();
+            TempData["Ok"] = "Đã đặt lại mật khẩu. Hãy đăng nhập bằng mật khẩu mới.";
             return RedirectToAction("Login");
         }
 
